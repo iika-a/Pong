@@ -7,7 +7,7 @@ This is also my first time writing Kotlin programs as well as developing a game 
 
 ## Usage
 1. Download the `.jar` file
-2. Download Java
+2. Download and install [Java](https://adoptium.net/download/) (Minimum Version 8)
 3. Double-click the file OR run `java -jar path\to\Pong.jar` in a command line.
 
 ## Features
@@ -31,6 +31,9 @@ Goals I want to implement in the future. (NOT CONFIRMED)
 ![Game Screenshot](screenshots/Screenshot_1.png)
 ![Game Screenshot](screenshots/Screenshot_2.png)
 ![Game Screenshot](screenshots/Screenshot_3.png)
+
+## License
+This project is open source and available for personal use. Feel free to share and modify it!
 
 ## Contact
 Created by [**iika**](https://github.com/iika-a/)<br>
