@@ -6,7 +6,7 @@ This game is a side project that I also uploaded as Project #1 for my APCS Portf
 This is also my first time writing Kotlin programs as well as developing a game in general.
 
 ## Usage
-1. Download the `.jar` file
+1. [Download](https://github.com/iika-a/Pong/releases) the `.jar` file
 2. Download and install [Java](https://adoptium.net/download/) (Minimum Version 8)
 3. Double-click the file OR run `java -jar path\to\Pong.jar` in a command line.
 
