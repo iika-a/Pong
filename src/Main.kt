@@ -1,7 +1,11 @@
+import com.formdev.flatlaf.FlatLightLaf
+
 import java.util.ArrayList
 import java.awt.event.KeyEvent
 import javax.swing.OverlayLayout
 import javax.swing.SwingUtilities
+import javax.swing.UIManager
+import javax.swing.UnsupportedLookAndFeelException
 import javax.swing.JFrame
 import javax.swing.JPanel
 
@@ -15,6 +19,13 @@ fun main() {
     val paddle2 = Paddle(side = 1, leftKey = KeyEvent.VK_LEFT, rightKey = KeyEvent.VK_RIGHT)
     gameObjectList.add(paddle2)
     val scoreKeeper = ScoreKeeper(0.0, 0.0)
+
+    try {
+        UIManager.setLookAndFeel(FlatLightLaf())
+    } catch (e: UnsupportedLookAndFeelException) {
+        e.printStackTrace()
+        System.err.println("Failed to initialize FlatLaf.")
+    }
 
     SwingUtilities.invokeLater {
         val gameFrame = JFrame("iika's Pong")
