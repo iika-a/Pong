@@ -1,3 +1,5 @@
+import kotlin.math.floor
+
 class GameLoop(private val gamePanel: GamePanel) : Runnable {
 
     @Volatile
@@ -27,11 +29,10 @@ class GameLoop(private val gamePanel: GamePanel) : Runnable {
             lag += elapsedTime
 
             while (lag >= 1.0) {
-                gamePanel.advanceGame(1.0 / targetFPS)
-                lag -= 1.0
+                val loops = floor(lag).toInt()
+                for (i in 1..loops) gamePanel.advanceGame(1.0 / targetFPS)
+                lag -= loops
             }
-
-            gamePanel.repaint()
 
             Thread.sleep(1)
         }
