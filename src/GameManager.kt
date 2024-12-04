@@ -10,7 +10,6 @@ import kotlin.random.Random
 class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: ArrayList<GameObject>): GameEventListener,
     ActionListener {
     private var playerNum = 0
-    private val gameTimer = Timer(1, this)
     private val ballTimer = Timer(1000, this)
     private val powerUpTimer = Timer(15000, this)
     private val powerUpList = ArrayList<PowerUp>()
@@ -25,6 +24,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         PowerUpType.SPAWN_BALL to 0.02
     )
     private val excludeList = ArrayList<PowerUpType>()
+    private val gameLoop = GameLoop(gamePanel)
 
     init {
         gamePanel.setPowerUpList(powerUpList)
@@ -50,7 +50,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
     }
 
     override fun onGameEnd() {
-        gameTimer.stop()
+        gameLoop.stop()
         ballTimer.stop()
         powerUpTimer.stop()
     }
@@ -80,7 +80,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     override fun actionPerformed(e: ActionEvent?) {
         when(e?.source) {
-            gameTimer -> gamePanel.advanceGame()
             ballTimer -> gamePanel.speedUpBall()
             powerUpTimer -> createPowerUp()
         }
@@ -130,7 +129,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         gamePanel.initializeBall()
         gamePanel.initializePaddles(paddleNum)
         gamePanel.initializeComponents()
-        gameTimer.start()
+        gameLoop.start()
         ballTimer.start()
         powerUpTimer.initialDelay = powerUpTimer.delay
         powerUpTimer.start()

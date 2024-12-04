@@ -10,7 +10,7 @@ import javax.swing.JPanel
 import javax.swing.border.LineBorder
 import kotlin.math.PI
 import kotlin.math.cos
-import kotlin.math.floor
+import kotlin.math.round
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -188,14 +188,14 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         }
     }
 
-    fun advanceGame() {
+    fun advanceGame(dt: Double) {
         for (gameObject in gameObjectList) {
             when (gameObject) {
-                is Ball -> gameObject.move(floor(gameObject.xVelocity).toInt(), floor(gameObject.yVelocity).toInt())
+                is Ball -> gameObject.move(round(gameObject.xVelocity * dt).toInt(), round(gameObject.yVelocity * dt).toInt())
 
                 is Paddle -> {
-                    if (gameObject.leftPress) gameObject.move(-gameObject.paddleSpeed, 0)
-                    if (gameObject.rightPress) gameObject.move(gameObject.paddleSpeed, 0)
+                    if (gameObject.leftPress) gameObject.move(round(-gameObject.paddleSpeed * dt).toInt(), 0)
+                    if (gameObject.rightPress) gameObject.move(round(gameObject.paddleSpeed * dt).toInt(), 0)
                 }
             }
         }
@@ -364,7 +364,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                 if (gameObject.isTemporary) iterator.remove()
 
                 gameObject.processed = false
-                gameObject.ballSpeed = (8..10).random().toDouble()
+                gameObject.ballSpeed = (500..575).random().toDouble()
                 if (i++ % 2 == 0) gameObject.velocityAngle = getRandomAngle()
                 else gameObject.velocityAngle = getRandomAngle() + PI
                 gameObject.xVelocity = gameObject.ballSpeed * cos(gameObject.velocityAngle)
@@ -380,7 +380,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             if (playerNum == 2 && gameObject is Paddle) {
                 if (paddleNum == 0 || gameObject.side == paddleNum) {
                     gameObject.paddleWidth = 100
-                    gameObject.paddleSpeed = 10
+                    gameObject.paddleSpeed = 600
                     gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
                 }
                 if (gameObject.side == 1 && !isSplitGame) gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
@@ -395,7 +395,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                     gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
 
                     gameObject.paddleWidth = 100
-                    gameObject.paddleSpeed = 10
+                    gameObject.paddleSpeed = 600
                     if (isSplitGame && i % 2 == 0) gameObject.xPosition = this.width / 2 + this.width / 4 - gameObject.paddleWidth / 2
                     if (isSplitGame && i++ % 2 == 1) gameObject.xPosition = this.width / 2 - this.width / 4 - gameObject.paddleWidth / 2
                 }
@@ -445,7 +445,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     fun speedUpBall() {
         for (gameObject in gameObjectList) {
             if (gameObject is Ball) {
-                gameObject.ballSpeed += 0.1
+                gameObject.ballSpeed += 10
 
                 if (gameObject.velocityAngle < PI) {
                     gameObject.xVelocity = gameObject.ballSpeed * cos(gameObject.velocityAngle) * (if (gameObject.xVelocity < 0) -1 else 1)
@@ -521,9 +521,9 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     private fun applyPowerup(paddle: Paddle, type: PowerUpType) {
         when (type) {
             PowerUpType.INCREASE_PADDLE_SIZE -> paddle.paddleWidth += (15..25).random()
-            PowerUpType.INCREASE_PADDLE_SPEED -> paddle.paddleSpeed += 4
+            PowerUpType.INCREASE_PADDLE_SPEED -> paddle.paddleSpeed += 100
             PowerUpType.RANDOMIZE_BALL_ANGLE -> gameObjectList.filterIsInstance<Ball>().random().velocityAngle = getRandomAngle()
-            PowerUpType.RANDOMIZE_BALL_SPEED -> gameObjectList.filterIsInstance<Ball>().random().ballSpeed = (6..10).random().toDouble()
+            PowerUpType.RANDOMIZE_BALL_SPEED -> gameObjectList.filterIsInstance<Ball>().random().ballSpeed = (475..575).random().toDouble()
             PowerUpType.SPAWN_BALL -> gameObjectList.add((Ball(xPos = this.width/2, yPos = this.height/2, velocityAngle = getRandomAngle(), ballSpeed = (6..8).random().toDouble(), isTemporary = true)))
         }
     }
