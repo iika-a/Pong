@@ -34,7 +34,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
     override fun onGameEvent(e: GameEvent) {
         when (e) {
             GameEvent.REPLAY_GAME -> startGame()
-            GameEvent.STOP_GAME -> stopGame()
             GameEvent.EXIT_TO_MENU -> doMenu()
             GameEvent.CREATE_POWER_UP -> createPowerUp()
             GameEvent.ADD_SCORE_ONE -> scoreKeeper.score1 += 1
@@ -48,6 +47,12 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     override fun onGameStart(options: DefaultListModel<GameOption>) {
         startGame(gameOptionList = options)
+    }
+
+    override fun onGameEnd() {
+        gameTimer.stop()
+        ballTimer.stop()
+        powerUpTimer.stop()
     }
 
     override fun onSetKeybind(key: Int, index: Int) {
@@ -131,12 +136,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         powerUpTimer.start()
         gamePanel.isVisible = true
         gamePanel.requestFocusInWindow()
-    }
-
-    private fun stopGame() {
-        gameTimer.stop()
-        ballTimer.stop()
-        powerUpTimer.stop()
     }
 
     private fun doMenu() {

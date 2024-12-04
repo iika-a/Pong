@@ -205,14 +205,14 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         when (checkForLoss()) {
             1 -> {
                 refreshGains()
-                gameManager?.onGameEvent(GameEvent.STOP_GAME)
+                gameManager?.onGameEnd()
                 multiLossLabel.isVisible = true
                 replayButton.isVisible = true
                 exitButton.isVisible = true
             }
 
             2 -> {
-                gameManager?.onGameEvent(GameEvent.STOP_GAME)
+                gameManager?.onGameEnd()
                 lossLabel.isVisible = true
                 replayButton.isVisible = true
                 exitButton.isVisible = true
@@ -221,22 +221,21 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
 
         when (checkForWin()) {
             1 -> {
-                gameManager?.onGameEvent(GameEvent.STOP_GAME)
+                gameManager?.onGameEnd()
                 winLabel1.isVisible = true
                 continueButton.isVisible = true
                 exitButton.isVisible = true
             }
 
             2 -> {
-                gameManager?.onGameEvent(GameEvent.STOP_GAME)
+                gameManager?.onGameEnd()
                 winLabel2.isVisible = true
                 continueButton.isVisible = true
                 exitButton.isVisible = true
             }
 
             3 -> {
-                gameManager?.onGameEvent(GameEvent.STOP_GAME)
-                winLabel.isVisible = true
+                gameManager?.onGameEnd()
                 replayButton.isVisible = true
                 exitButton.isVisible = true
             }
