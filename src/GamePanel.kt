@@ -123,7 +123,11 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     override fun paintComponent(g: Graphics?) {
         super.paintComponent(g)
 
-        for (obstacle in obstacleList) {
+        val obstacles = ArrayList(obstacleList)
+        val powerUps = ArrayList(powerUpList)
+        val gameObjects = ArrayList(gameObjectList)
+
+        for (obstacle in obstacles) {
             g?.color = Color.BLACK
             g?.fillRect(obstacle.xPosition - 2, obstacle.yPosition - 2, obstacle.width + 4, obstacle.height + 4)
 
@@ -131,8 +135,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             g?.fillRect(obstacle.xPosition, obstacle.yPosition, obstacle.width, obstacle.height)
         }
 
-        val tempList = powerUpList
-        for(powerUp in tempList) {
+        for(powerUp in powerUps) {
             g?.color = Color.BLACK
             when (powerUp.side) {
                 1 -> g?.fillRect(powerUp.xPosition - 2, this.height - 10 - 2, 54, 12)
@@ -153,7 +156,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             }
         }
 
-        for (gameObject in gameObjectList) {
+        for (gameObject in gameObjects) {
             when (gameObject) {
                 is Ball -> {
                     g?.color = Color.BLACK
