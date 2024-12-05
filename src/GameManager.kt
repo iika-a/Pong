@@ -10,7 +10,6 @@ import kotlin.random.Random
 class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: ArrayList<GameObject>): GameEventListener,
     ActionListener {
     private var playerNum = 0
-    private val ballTimer = Timer(1000, this)
     private val powerUpTimer = Timer(15000, this)
     private val powerUpList = ArrayList<PowerUp>()
     private val obstacleList = ArrayList<Obstacle>()
@@ -51,7 +50,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     override fun onGameEnd() {
         gameLoop.stop()
-        ballTimer.stop()
         powerUpTimer.stop()
     }
 
@@ -80,7 +78,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     override fun actionPerformed(e: ActionEvent?) {
         when(e?.source) {
-            ballTimer -> gamePanel.speedUpBall()
             powerUpTimer -> createPowerUp()
         }
     }
@@ -130,7 +127,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         gamePanel.initializePaddles(paddleNum)
         gamePanel.initializeComponents()
         gameLoop.start()
-        ballTimer.start()
         powerUpTimer.initialDelay = powerUpTimer.delay
         powerUpTimer.start()
         gamePanel.isVisible = true

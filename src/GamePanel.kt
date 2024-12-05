@@ -364,7 +364,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                 if (gameObject.isTemporary) iterator.remove()
 
                 gameObject.processed = false
-                gameObject.ballSpeed = (500..575).random().toDouble()
+                gameObject.ballSpeed = (550..625).random().toDouble()
                 if (i++ % 2 == 0) gameObject.velocityAngle = getRandomAngle()
                 else gameObject.velocityAngle = getRandomAngle() + PI
                 gameObject.xVelocity = gameObject.ballSpeed * cos(gameObject.velocityAngle)
@@ -380,7 +380,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             if (playerNum == 2 && gameObject is Paddle) {
                 if (paddleNum == 0 || gameObject.side == paddleNum) {
                     gameObject.paddleWidth = 100
-                    gameObject.paddleSpeed = 600
+                    gameObject.paddleSpeed = 625
                     gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
                 }
                 if (gameObject.side == 1 && !isSplitGame) gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
@@ -395,7 +395,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                     gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
 
                     gameObject.paddleWidth = 100
-                    gameObject.paddleSpeed = 600
+                    gameObject.paddleSpeed = 625
                     if (isSplitGame && i % 2 == 0) gameObject.xPosition = this.width / 2 + this.width / 4 - gameObject.paddleWidth / 2
                     if (isSplitGame && i++ % 2 == 1) gameObject.xPosition = this.width / 2 - this.width / 4 - gameObject.paddleWidth / 2
                 }
@@ -442,10 +442,10 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         return Random.nextDouble(PI /9, 7 * PI /18)
     }
 
-    fun speedUpBall() {
+    fun speedUpBall(increment: Double = 10.0) {
         for (gameObject in gameObjectList) {
             if (gameObject is Ball) {
-                gameObject.ballSpeed += 10
+                gameObject.ballSpeed += increment
 
                 if (gameObject.velocityAngle < PI) {
                     gameObject.xVelocity = gameObject.ballSpeed * cos(gameObject.velocityAngle) * (if (gameObject.xVelocity < 0) -1 else 1)
