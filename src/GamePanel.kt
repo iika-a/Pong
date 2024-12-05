@@ -368,7 +368,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                 if (gameObject.isTemporary) iterator.remove()
 
                 gameObject.processed = false
-                gameObject.ballSpeed = (550..625).random().toDouble()
+                gameObject.ballSpeed = (550..600).random().toDouble()
                 if (i++ % 2 == 0) gameObject.velocityAngle = getRandomAngle()
                 else gameObject.velocityAngle = getRandomAngle() + PI
                 gameObject.xVelocity = gameObject.ballSpeed * cos(gameObject.velocityAngle)
@@ -529,8 +529,8 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             PowerUpType.RANDOMIZE_BALL_ANGLE -> gameObjectList.filterIsInstance<Ball>().random().velocityAngle = getRandomAngle()
             PowerUpType.RANDOMIZE_BALL_SPEED -> gameObjectList.filterIsInstance<Ball>().random().ballSpeed = (475..575).random().toDouble()
             PowerUpType.SPAWN_BALL -> {
-            val velocityAngle = getRandomAngle()
-            val ballSpeed = (550..625).random().toDouble()
+            val velocityAngle = getRandomAngle() + if((0..1).random() == 1) PI else 0.0
+            val ballSpeed = (550..600).random().toDouble()
             val xVelocity = ballSpeed * cos(velocityAngle)
             val yVelocity = ballSpeed * sin(velocityAngle)
             gameObjectList.add(Ball(
