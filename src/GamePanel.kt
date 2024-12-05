@@ -131,7 +131,8 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             g?.fillRect(obstacle.xPosition, obstacle.yPosition, obstacle.width, obstacle.height)
         }
 
-        for(powerUp in powerUpList) {
+        val tempList = powerUpList
+        for(powerUp in tempList) {
             g?.color = Color.BLACK
             when (powerUp.side) {
                 1 -> g?.fillRect(powerUp.xPosition - 2, this.height - 10 - 2, 54, 12)

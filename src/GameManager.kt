@@ -1,29 +1,15 @@
 import java.awt.Color
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import java.awt.event.KeyEvent
 import java.util.ArrayList
 import javax.swing.DefaultListModel
-import javax.swing.Timer
-import kotlin.random.Random
 
-class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: ArrayList<GameObject>): GameEventListener,
-    ActionListener {
+class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: ArrayList<GameObject>): GameEventListener {
     private var playerNum = 0
-    private val powerUpTimer = Timer(15000, this)
     private val powerUpList = ArrayList<PowerUp>()
     private val obstacleList = ArrayList<Obstacle>()
     private val colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
     private val keybinds = arrayOf(KeyEvent.VK_COMMA, KeyEvent.VK_SLASH, KeyEvent.VK_F, KeyEvent.VK_H)
-    private val everyPowerUp = arrayOf(
-        PowerUpType.INCREASE_PADDLE_SIZE to 0.245,
-        PowerUpType.INCREASE_PADDLE_SPEED to 0.245,
-        PowerUpType.RANDOMIZE_BALL_SPEED to 0.245,
-        PowerUpType.RANDOMIZE_BALL_ANGLE to 0.245,
-        PowerUpType.SPAWN_BALL to 0.02
-    )
-    private val excludeList = ArrayList<PowerUpType>()
-    private val gameLoop = GameLoop(gamePanel)
+    private val gameLoop = GameLoop(gamePanel, powerUpList)
 
     init {
         gamePanel.setPowerUpList(powerUpList)
@@ -34,7 +20,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         when (e) {
             GameEvent.REPLAY_GAME -> startGame()
             GameEvent.EXIT_TO_MENU -> doMenu()
-            GameEvent.CREATE_POWER_UP -> createPowerUp()
+            GameEvent.CREATE_POWER_UP -> gameLoop.createPowerUp()
             GameEvent.ADD_SCORE_ONE -> scoreKeeper.score1 += 1
             GameEvent.ADD_SCORE_ONE_HALF -> scoreKeeper.score1 += 0.5
             GameEvent.ADD_SCORE_TWO -> scoreKeeper.score2 += 1
@@ -50,7 +36,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     override fun onGameEnd() {
         gameLoop.stop()
-        powerUpTimer.stop()
     }
 
     override fun onSetKeybind(key: Int, index: Int) {
@@ -72,14 +57,8 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
     }
 
     override fun onTogglePowerUp(type: PowerUpType, exclude: Boolean) {
-        if (exclude) excludeList.add(type)
-        else excludeList.remove(type)
-    }
-
-    override fun actionPerformed(e: ActionEvent?) {
-        when(e?.source) {
-            powerUpTimer -> createPowerUp()
-        }
+        if (exclude) gameLoop.getExcludeList().add(type)
+        else gameLoop.getExcludeList().remove(type)
     }
 
     private fun startGame(paddleNum: Int = 0, gameOptionList: DefaultListModel<GameOption> = DefaultListModel<GameOption>()) {
@@ -127,8 +106,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         gamePanel.initializePaddles(paddleNum)
         gamePanel.initializeComponents()
         gameLoop.start()
-        powerUpTimer.initialDelay = powerUpTimer.delay
-        powerUpTimer.start()
         gamePanel.isVisible = true
         gamePanel.requestFocusInWindow()
     }
@@ -141,33 +118,11 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         menuPanel.doMenu()
     }
 
-    private fun createPowerUp() {
-        when (playerNum) {
-            1 -> powerUpList.add(PowerUp((0..gamePanel.width).random(), 1, getRandomWithExclusions(everyPowerUp, excludeList)))
-            2 -> powerUpList.add(PowerUp(xPos = (0..gamePanel.width).random(), type = getRandomWithExclusions(everyPowerUp, excludeList)))
-        }
-    }
-
-    private fun getRandomWithExclusions(items: Array<Pair<PowerUpType, Double>>, toExclude: ArrayList<PowerUpType> = ArrayList()): PowerUpType {
-        val filteredItems = items.filter { it.first !in toExclude }
-        val totalWeight = filteredItems.sumOf { it.second }
-        val cumulativeWeights = filteredItems.map { it.second / totalWeight }.runningFold(0.0) { acc, weight -> acc + weight }
-        val randomValue = Random.nextDouble(1.0)
-
-        for (i in cumulativeWeights.indices) {
-            if (randomValue < cumulativeWeights[i]) {
-                return filteredItems[i - 1].first
-            }
-        }
-
-        throw IllegalStateException("Should never reach here")
-    }
-
     private fun setGameMode(gameMode: GameMode) {
         when (gameMode) {
-            GameMode.NORMAL_MODE -> powerUpTimer.delay = 10000
-            GameMode.CHAOS_MODE -> powerUpTimer.delay = 500
-            GameMode.BORING_MODE -> powerUpTimer.delay = Int.MAX_VALUE
+            GameMode.NORMAL_MODE -> gameLoop.setPowerUpCount(2400)
+            GameMode.CHAOS_MODE -> gameLoop.setPowerUpCount(120)
+            GameMode.BORING_MODE -> gameLoop.setPowerUpCount(Int.MAX_VALUE)
         }
     }
 
@@ -190,5 +145,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
     private fun setPlayers(playerNum: Int) {
         this.playerNum = playerNum
         gamePanel.setPlayers(playerNum)
+        gameLoop.setPlayerNum(playerNum)
     }
 }
