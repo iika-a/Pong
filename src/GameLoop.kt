@@ -53,7 +53,6 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: ArrayL
     }
 
     override fun run() {
-
         while (isRunning) {
             val startTime = System.nanoTime()
 

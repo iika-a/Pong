@@ -16,8 +16,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
 
-class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(),
-    KeyListener {
+class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), KeyListener {
     private var player1Gain = 0
     private var player2Gain = 0
     private val gameFont = Font("Segoe UI", 0, 14)
@@ -31,7 +30,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     private val replayButton = JButton("Play Again").apply { setButtonSettings(this) }
     private val exitButton = JButton("Return to Menu").apply { setButtonSettings(this) }
     private val continueButton = JButton("Continue Game").apply { setButtonSettings(this) }
-    private var gameManager: GameEventListener? = null
+    private var gameManager: GameListener? = null
     private var playerNum = 0
     private var powerUpList = ArrayList<PowerUp>()
     private var obstacleList = ArrayList<Obstacle>()
@@ -562,7 +561,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     }
 
     fun setPlayers(playerNum: Int) { this.playerNum = playerNum }
-    fun setGameEventListener(listener: GameEventListener) { this.gameManager = listener }
+    fun setGameListener(listener: GameListener) { this.gameManager = listener }
     fun setPowerUpList(list: ArrayList<PowerUp>) { this.powerUpList = list }
     fun setObstacleList(list: ArrayList<Obstacle>) { this.obstacleList = list }
     fun setSplitGame(sg: Boolean) { this.isSplitGame = sg }

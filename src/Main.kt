@@ -55,8 +55,8 @@ fun main() {
         gamePanel.initializeComponents()
 
         val gameManager = GameManager(gamePanel, menuPanel, scoreKeeper, gameObjectList)
-        gamePanel.setGameEventListener(gameManager)
-        menuPanel.setGameEventListener(gameManager)
+        gamePanel.setGameListener(gameManager)
+        menuPanel.setGameListener(gameManager)
 
         gameManager.onGameEvent(GameEvent.EXIT_TO_MENU)
     }

@@ -1,7 +1,7 @@
 import java.awt.Color
 import javax.swing.DefaultListModel
 
-interface GameEventListener {
+interface GameListener {
     fun onGameEvent(e: GameEvent)
     fun onGameStart(options: DefaultListModel<GameOption>)
     fun onGameEnd()

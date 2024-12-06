@@ -3,7 +3,7 @@ import java.awt.event.KeyEvent
 import java.util.ArrayList
 import javax.swing.DefaultListModel
 
-class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: ArrayList<GameObject>): GameEventListener {
+class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: ArrayList<GameObject>): GameListener {
     private var playerNum = 0
     private val powerUpList = ArrayList<PowerUp>()
     private val obstacleList = ArrayList<Obstacle>()

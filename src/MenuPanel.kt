@@ -25,8 +25,7 @@ import javax.swing.JCheckBox
 import javax.swing.border.LineBorder
 import kotlin.system.exitProcess
 
-class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(),
-    ActionListener, KeyListener, ItemListener {
+class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), ActionListener, KeyListener, ItemListener {
     private val gameSetupPanel = JPanel(BorderLayout())
     private val settingsPanel = JPanel(BorderLayout())
     private val cards = CardLayout()
@@ -119,7 +118,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
     private var currentMenu = "Main Menu"
     private var gameOptionList = DefaultListModel<GameOption>()
-    private var gameManager: GameEventListener? = null
+    private var gameManager: GameListener? = null
 
     init {
         this.layout = cards
@@ -758,7 +757,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         }
     }
 
-    fun setGameEventListener(listener: GameEventListener) {
+    fun setGameListener(listener: GameListener) {
         this.gameManager = listener
     }
 
