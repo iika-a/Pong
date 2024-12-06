@@ -1,3 +1,5 @@
+import java.awt.Graphics
+import java.awt.Graphics2D
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.GridBagLayout
@@ -194,7 +196,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private fun createMainMenu(): JPanel {
         val panel = JPanel(GridBagLayout())
         val mainLabel = JLabel("iika's Pong").apply { font = menuFont }
-        val versionLabel = JLabel("version 1.0").apply { font = menuFont.deriveFont(12f) }
+        val versionLabel = JLabel("version 1.1").apply { font = menuFont.deriveFont(12f) }
         versionLabel.horizontalAlignment = JLabel.CENTER
         mainLabel.horizontalAlignment = JLabel.CENTER
 
@@ -758,6 +760,11 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
     fun setGameEventListener(listener: GameEventListener) {
         this.gameManager = listener
+    }
+
+    override fun paintComponent(g: Graphics?) {
+        val g2d = g as Graphics2D
+        super.paintComponent(g2d)
     }
 
     //no implementation needed

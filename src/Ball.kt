@@ -1,9 +1,9 @@
 data class Ball (
-    val xPos: Int = 0,
-    val yPos: Int = 0,
+    val xPos: Double = 0.0,
+    val yPos: Double = 0.0,
     val xVel: Double = 0.0,
     val yVel: Double = 0.0,
-    val ballRadius: Int = 10,
+    val ballRadius: Double = 10.0,
     var velocityAngle: Double = 0.0,
     var ballSpeed: Double = 0.0,
     var processed: Boolean = false,

@@ -1,6 +1,5 @@
 enum class GameEvent {
     REPLAY_GAME,
-    STOP_GAME,
     EXIT_TO_MENU,
     CREATE_POWER_UP,
     ADD_SCORE_ONE,
