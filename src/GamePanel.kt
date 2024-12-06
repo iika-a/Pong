@@ -1,6 +1,9 @@
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
+import java.awt.Graphics2D
+import java.awt.geom.Rectangle2D
+import java.awt.geom.Ellipse2D
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.util.ArrayList
@@ -10,7 +13,6 @@ import javax.swing.JPanel
 import javax.swing.border.LineBorder
 import kotlin.math.PI
 import kotlin.math.cos
-import kotlin.math.round
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -121,63 +123,64 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     }
 
     override fun paintComponent(g: Graphics?) {
-        super.paintComponent(g)
+        val g2d = g as Graphics2D
+        super.paintComponent(g2d)
 
         val obstacles = ArrayList(obstacleList)
         val powerUps = ArrayList(powerUpList)
         val gameObjects = ArrayList(gameObjectList)
 
         for (obstacle in obstacles) {
-            g?.color = Color.BLACK
-            g?.fillRect(obstacle.xPosition - 2, obstacle.yPosition - 2, obstacle.width + 4, obstacle.height + 4)
+            g2d.color = Color.BLACK
+            g2d.fill(Rectangle2D.Double(obstacle.xPosition - 2, obstacle.yPosition - 2, obstacle.width + 4, obstacle.height + 4))
 
-            g?.color = colors[2]
-            g?.fillRect(obstacle.xPosition, obstacle.yPosition, obstacle.width, obstacle.height)
+            g2d.color = colors[2]
+            g2d.fill(Rectangle2D.Double(obstacle.xPosition, obstacle.yPosition, obstacle.width, obstacle.height))
         }
 
         for(powerUp in powerUps) {
-            g?.color = Color.BLACK
+            g2d.color = Color.BLACK
             when (powerUp.side) {
-                1 -> g?.fillRect(powerUp.xPosition - 2, this.height - 10 - 2, 54, 12)
-                2 -> g?.fillRect(powerUp.xPosition - 2, 0, 54, 12)
+                1 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition - 2, this.height - 10 - 2.0, 54.0, 12.0))
+                2 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition - 2, 0.0, 54.0, 12.0))
             }
 
             when (powerUp.type) {
-                PowerUpType.INCREASE_PADDLE_SIZE -> g?.color = Color.RED
-                PowerUpType.INCREASE_PADDLE_SPEED -> g?.color = Color.BLUE
-                PowerUpType.RANDOMIZE_BALL_SPEED -> g?.color = Color.GREEN
-                PowerUpType.RANDOMIZE_BALL_ANGLE -> g?.color = Color.YELLOW
-                PowerUpType.SPAWN_BALL -> g?.color = Color.MAGENTA
+                PowerUpType.INCREASE_PADDLE_SIZE -> g2d.color = Color.RED
+                PowerUpType.INCREASE_PADDLE_SPEED -> g2d.color = Color.BLUE
+                PowerUpType.RANDOMIZE_BALL_SPEED -> g2d.color = Color.GREEN
+                PowerUpType.RANDOMIZE_BALL_ANGLE -> g2d.color = Color.YELLOW
+                PowerUpType.SPAWN_BALL -> g2d.color = Color.MAGENTA
             }
 
             when (powerUp.side) {
-                1 -> g?.fillRect(powerUp.xPosition, this.height - 10, 50, 10)
-                2 -> g?.fillRect(powerUp.xPosition, 0, 50, 10)
+                1 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition, this.height - 10.0, 50.0, 10.0))
+                2 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition, 0.0, 50.0, 10.0))
             }
         }
 
         for (gameObject in gameObjects) {
             when (gameObject) {
                 is Ball -> {
-                    g?.color = Color.BLACK
-                    g?.fillOval(gameObject.xPosition - 2, gameObject.yPosition - 2, 2 * gameObject.ballRadius + 4, 2 * gameObject.ballRadius + 4)
-                    g?.color = colors[3]
-                    g?.fillOval(gameObject.xPosition, gameObject.yPosition, 2 * gameObject.ballRadius, 2 * gameObject.ballRadius)
+                    g2d.color = Color.BLACK
+                    g2d.fill(Ellipse2D.Double(gameObject.xPosition - 2, gameObject.yPosition - 2, 2 * gameObject.ballRadius + 4, 2 * gameObject.ballRadius + 4))
+                    g2d.color = colors[3]
+                    g2d.fill(Ellipse2D.Double(gameObject.xPosition, gameObject.yPosition, 2 * gameObject.ballRadius, 2 * gameObject.ballRadius))
                 }
 
                 is Paddle -> {
-                    g?.color = Color.BLACK
+                    g2d.color = Color.BLACK
                     when (gameObject.side) {
                         2 -> {
-                            g?.fillRect(gameObject.xPosition - 2, 0, gameObject.paddleWidth + 4, gameObject.paddleHeight + 2)
-                            g?.color = colors[1]
-                            g?.fillRect(gameObject.xPosition, 0, gameObject.paddleWidth, gameObject.paddleHeight)
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition - 2, 0.0, gameObject.paddleWidth + 4, gameObject.paddleHeight + 2))
+                            g2d.color = colors[1]
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition, 0.0, gameObject.paddleWidth, gameObject.paddleHeight))
                         }
 
                         1 -> {
-                            g?.fillRect(gameObject.xPosition - 2, this.height - gameObject.paddleHeight - 2, gameObject.paddleWidth + 4, gameObject.paddleHeight + 4)
-                            g?.color = colors[0]
-                            g?.fillRect(gameObject.xPosition, this.height - gameObject.paddleHeight, gameObject.paddleWidth, gameObject.paddleHeight)
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition - 2, this.height - gameObject.paddleHeight - 2, gameObject.paddleWidth + 4, gameObject.paddleHeight + 4))
+                            g2d.color = colors[0]
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition, this.height - gameObject.paddleHeight, gameObject.paddleWidth, gameObject.paddleHeight))
                         }
                     }
                 }
@@ -185,21 +188,24 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         }
 
         if (checkForLoss() != 0 || checkForWin() != 0) {
-            g?.color = Color.BLACK
-            g?.fillRect(this.width/2 - 125 - 2, this.height/2 - 35 - 2, 250 + 4, 185 + 4)
-            g?.color = Color(0xFFD1DC)
-            g?.fillRect(this.width/2 - 125, this.height/2 - 35, 250, 185)
+            g2d.color = Color.BLACK
+            g2d.fill(Rectangle2D.Double(this.width/2 - 125 - 2.0, this.height/2 - 35 - 2.0, 254.0, 189.0))
+            g2d.color = Color(0xFFD1DC)
+            g2d.fill(Rectangle2D.Double(this.width/2 - 125.0, this.height/2 - 35.0, 250.0, 185.0))
         }
     }
 
     fun advanceGame(dt: Double) {
         for (gameObject in gameObjectList) {
             when (gameObject) {
-                is Ball -> gameObject.move(round(gameObject.xVelocity * dt).toInt(), round(gameObject.yVelocity * dt).toInt())
+                is Ball -> {
+                    gameObject.move(gameObject.xVelocity * dt, gameObject.yVelocity * dt)
+                    speedUpBall(5 * dt)
+                }
 
                 is Paddle -> {
-                    if (gameObject.leftPress) gameObject.move(round(-gameObject.paddleSpeed * dt).toInt(), 0)
-                    if (gameObject.rightPress) gameObject.move(round(gameObject.paddleSpeed * dt).toInt(), 0)
+                    if (gameObject.leftPress) gameObject.move(-gameObject.paddleSpeed * dt, 0.0)
+                    if (gameObject.rightPress) gameObject.move(gameObject.paddleSpeed * dt, 0.0)
                 }
             }
         }
@@ -263,7 +269,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                         }
 
                         if (otherObject is Paddle) {
-                            val paddleTop = if (otherObject.side == 1) this.height - otherObject.paddleHeight else 0
+                            val paddleTop = if (otherObject.side == 1) this.height - otherObject.paddleHeight else 0.0
                             val paddleBottom = paddleTop + otherObject.paddleHeight
 
                             if (gameObject.yPosition + 2 * gameObject.ballRadius >= paddleTop &&
@@ -285,7 +291,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                 }
 
                 is Paddle -> {
-                    if (gameObject.xPosition < 0) gameObject.xPosition = 0
+                    if (gameObject.xPosition < 0) gameObject.xPosition = 0.0
                     if (gameObject.xPosition + gameObject.paddleWidth > this.width) gameObject.xPosition = this.width - gameObject.paddleWidth
                 }
             }
@@ -353,26 +359,24 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
 
     fun initializeBall() {
         var i = 0
-        var j = 0
 
         val iterator = gameObjectList.iterator()
         while (iterator.hasNext()) {
             val gameObject = iterator.next()
 
             if (gameObject is Ball) {
-                gameObject.xPosition = ((this.width/3)..(2 * this.width/3)).random()
-                gameObject.yPosition = this.height / 2
+                gameObject.xPosition = ((this.width/4)..(2 * this.width/3)).random().toDouble()
+                gameObject.yPosition = this.height / 2.0
 
-                if (isSplitGame && j % 2 == 0) gameObject.xPosition = this.width / 2 - this.width / 4
-                if (isSplitGame && j++ % 2 == 1) gameObject.xPosition = this.width / 2 + this.width / 4
+                if (isSplitGame && i % 2 == 0) gameObject.xPosition = this.width / 2 - this.width / 4.0
+                if (isSplitGame && i % 2 == 1) gameObject.xPosition = this.width / 2 + this.width / 4.0
                 if (gameObject.isTemporary) iterator.remove()
 
                 gameObject.processed = false
-                gameObject.ballSpeed = (550..600).random().toDouble()
-                if (i++ % 2 == 0) gameObject.velocityAngle = getRandomAngle()
-                else gameObject.velocityAngle = getRandomAngle() + PI
+                gameObject.ballSpeed = (550..650).random().toDouble()
+                gameObject.velocityAngle = getRandomAngle()
                 gameObject.xVelocity = gameObject.ballSpeed * cos(gameObject.velocityAngle)
-                gameObject.yVelocity = gameObject.ballSpeed * sin(gameObject.velocityAngle)
+                gameObject.yVelocity = gameObject.ballSpeed * sin(gameObject.velocityAngle) * (if (i++ % 2 == 1) -1 else 1)
             }
         }
     }
@@ -383,8 +387,8 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         for (gameObject in gameObjectList) {
             if (playerNum == 2 && gameObject is Paddle) {
                 if (paddleNum == 0 || gameObject.side == paddleNum) {
-                    gameObject.paddleWidth = 100
-                    gameObject.paddleSpeed = 625
+                    gameObject.paddleWidth = 100.0
+                    gameObject.paddleSpeed = 625.0
                     gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
                 }
                 if (gameObject.side == 1 && !isSplitGame) gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
@@ -393,13 +397,13 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             } else if (playerNum == 1 && gameObject is Paddle) {
                 if (gameObject.side == 2) {
                     gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
-                    gameObject.paddleWidth = 2000
-                    gameObject.paddleSpeed = 0
+                    gameObject.paddleWidth = 2000.0
+                    gameObject.paddleSpeed = 0.0
                 } else if (gameObject.side == 1) {
                     gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
 
-                    gameObject.paddleWidth = 100
-                    gameObject.paddleSpeed = 625
+                    gameObject.paddleWidth = 100.0
+                    gameObject.paddleSpeed = 625.0
                     if (isSplitGame && i % 2 == 0) gameObject.xPosition = this.width / 2 + this.width / 4 - gameObject.paddleWidth / 2
                     if (isSplitGame && i++ % 2 == 1) gameObject.xPosition = this.width / 2 - this.width / 4 - gameObject.paddleWidth / 2
                 }
@@ -446,19 +450,11 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         return Random.nextDouble(PI /9, 7 * PI /18)
     }
 
-    fun speedUpBall(increment: Double = 10.0) {
-        for (gameObject in gameObjectList) {
-            if (gameObject is Ball) {
-                gameObject.ballSpeed += increment
-
-                if (gameObject.velocityAngle < PI) {
-                    gameObject.xVelocity = gameObject.ballSpeed * cos(gameObject.velocityAngle) * (if (gameObject.xVelocity < 0) -1 else 1)
-                    gameObject.yVelocity = gameObject.ballSpeed * sin(gameObject.velocityAngle) * (if (gameObject.yVelocity < 0) -1 else 1)
-                } else {
-                    gameObject.xVelocity = gameObject.ballSpeed * cos(gameObject.velocityAngle + PI) * (if (gameObject.xVelocity < 0) -1 else 1)
-                    gameObject.yVelocity = gameObject.ballSpeed * sin(gameObject.velocityAngle + PI) * (if (gameObject.yVelocity < 0) -1 else 1)
-                }
-            }
+    private fun speedUpBall(increment: Double = 0.0) {
+        for (ball in gameObjectList.filterIsInstance<Ball>()) {
+            ball.ballSpeed += increment
+            ball.xVelocity = ball.ballSpeed * cos(ball.velocityAngle) * (if (ball.xVelocity < 0) -1 else 1)
+            ball.yVelocity = ball.ballSpeed * sin(ball.velocityAngle) * (if (ball.yVelocity < 0) -1 else 1)
         }
     }
 
@@ -527,15 +523,15 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             PowerUpType.INCREASE_PADDLE_SIZE -> paddle.paddleWidth += (15..25).random()
             PowerUpType.INCREASE_PADDLE_SPEED -> paddle.paddleSpeed += 100
             PowerUpType.RANDOMIZE_BALL_ANGLE -> gameObjectList.filterIsInstance<Ball>().random().velocityAngle = getRandomAngle()
-            PowerUpType.RANDOMIZE_BALL_SPEED -> gameObjectList.filterIsInstance<Ball>().random().ballSpeed = (475..575).random().toDouble()
+            PowerUpType.RANDOMIZE_BALL_SPEED -> gameObjectList.filterIsInstance<Ball>().random().ballSpeed = (475..625).random().toDouble()
             PowerUpType.SPAWN_BALL -> {
             val velocityAngle = getRandomAngle() + if((0..1).random() == 1) PI else 0.0
             val ballSpeed = (550..600).random().toDouble()
             val xVelocity = ballSpeed * cos(velocityAngle)
             val yVelocity = ballSpeed * sin(velocityAngle)
             gameObjectList.add(Ball(
-                xPos = ((this.width/3)..(2 * this.width/3)).random(),
-                yPos = this.height/2,
+                xPos = ((this.width/3)..(2 * this.width/3)).random().toDouble(),
+                yPos = this.height/2.0,
                 velocityAngle = velocityAngle,
                 ballSpeed = ballSpeed,
                 xVel = xVelocity,

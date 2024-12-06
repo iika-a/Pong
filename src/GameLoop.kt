@@ -27,12 +27,13 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: ArrayL
 
     fun stop() {
         isRunning = false
+        count = 0
     }
 
     fun createPowerUp() {
         when (playerNum) {
-            1 -> powerUpList.add(PowerUp((0..gamePanel.width).random(), 1, getRandomWithExclusions(everyPowerUp, excludeList)))
-            2 -> powerUpList.add(PowerUp(xPos = (0..gamePanel.width).random(), type = getRandomWithExclusions(everyPowerUp, excludeList)))
+            1 -> powerUpList.add(PowerUp((0..gamePanel.width).random().toDouble(), 1, getRandomWithExclusions(everyPowerUp, excludeList)))
+            2 -> powerUpList.add(PowerUp(xPos = (0..gamePanel.width).random().toDouble(), type = getRandomWithExclusions(everyPowerUp, excludeList)))
         }
     }
 
@@ -52,24 +53,23 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: ArrayL
     }
 
     override fun run() {
-        var lastTime = System.nanoTime()
-        var lag = 0.0
 
         while (isRunning) {
-            val currentTime = System.nanoTime()
-            val elapsedTime = (currentTime - lastTime) / nsPerFrame
-            lastTime = currentTime
-            lag += elapsedTime
+            val startTime = System.nanoTime()
 
-            while (lag >= 1.0) {
-                gamePanel.advanceGame(1.0 / targetFPS)
-                lag -= 1.0
+            gamePanel.advanceGame(1.0 / targetFPS)
 
-                if (count++ % 240 == 0) gamePanel.speedUpBall()
-                if (count % powerUpCount == 0) createPowerUp()
+            if (++count % powerUpCount == 0) createPowerUp()
+
+            val elapsedTime = System.nanoTime() - startTime
+
+            val sleepTime = nsPerFrame - elapsedTime
+            if (sleepTime > 0) {
+                val endTime = System.nanoTime() + sleepTime
+                while (System.nanoTime() < endTime) {
+                    // waiting for accurate frame timing
+                }
             }
-
-            Thread.sleep(1)
         }
     }
 

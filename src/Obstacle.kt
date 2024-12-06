@@ -1,6 +1,6 @@
 data class Obstacle (
-    val xPos: Int,
-    val yPos: Int,
-    val wid: Int = (100..200).random(),
-    val heig: Int = (100..200).random(),
+    val xPos: Double,
+    val yPos: Double,
+    val wid: Double = (100..200).random().toDouble(),
+    val heig: Double = (100..200).random().toDouble(),
 ): GameObject(xPos, yPos, 0.0, 0.0, wid, heig)

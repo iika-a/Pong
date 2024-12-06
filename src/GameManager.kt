@@ -90,7 +90,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
                     gameObjectList.add(Paddle(side = 1, leftKey = keybinds[0], rightKey = keybinds[1]))
                     if (playerNum == 2) gameObjectList.add(Paddle(side = 2, leftKey = keybinds[2], rightKey = keybinds[3]))
                     gameObjectList.add(Ball())
-                    obstacleList.add(Obstacle(gamePanel.width / 2 - 5, 0, 10, gamePanel.height))
+                    obstacleList.add(Obstacle(gamePanel.width / 2 - 5.0, 0.0, 10.0, gamePanel.height.toDouble()))
                 }
                 null -> throw NoWhenBranchMatchedException("Invalid Game Option")
             }
@@ -132,12 +132,12 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
             GameMap.RANDOM_OBSTACLES -> {
                 obstacleList.clear()
-                for (i in 1..obstacles) obstacleList.add(Obstacle((20..gamePanel.width-200).random(), (20..gamePanel.height-200).random()))
+                for (i in 1..obstacles) obstacleList.add(Obstacle((20..gamePanel.width-200).random().toDouble(), (20..gamePanel.height-200).random().toDouble()))
             }
 
             GameMap.ONE_BIG_BLOCK -> {
                 obstacleList.clear()
-                obstacleList.add(Obstacle(200, 200, gamePanel.width - 400, gamePanel.height - 400))
+                obstacleList.add(Obstacle(200.0, 200.0, gamePanel.width - 400.0, gamePanel.height - 400.0))
             }
         }
     }
