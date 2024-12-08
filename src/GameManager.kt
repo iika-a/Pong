@@ -13,7 +13,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     init {
         gamePanel.setPowerUpList(powerUpList)
-        gamePanel.setObstacleList(obstacleList)
     }
 
     override fun onGameEvent(e: GameEvent) {
@@ -131,13 +130,11 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
             GameMap.NO_OBSTACLES -> {}
 
             GameMap.RANDOM_OBSTACLES -> {
-                obstacleList.clear()
-                for (i in 1..obstacles) obstacleList.add(Obstacle((20..gamePanel.width-200).random().toDouble(), (20..gamePanel.height-200).random().toDouble()))
+                for (i in 1..obstacles) gameObjectList.add(Obstacle((20..gamePanel.width-200).random().toDouble(), (20..gamePanel.height-200).random().toDouble()))
             }
 
             GameMap.ONE_BIG_BLOCK -> {
-                obstacleList.clear()
-                obstacleList.add(Obstacle(200.0, 200.0, gamePanel.width - 400.0, gamePanel.height - 400.0))
+                gameObjectList.add(Obstacle(200.0, 200.0, gamePanel.width - 400.0, gamePanel.height - 400.0))
             }
         }
     }

@@ -31,9 +31,9 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     private val exitButton = JButton("Return to Menu").apply { setButtonSettings(this) }
     private val continueButton = JButton("Continue Game").apply { setButtonSettings(this) }
     private var gameManager: GameListener? = null
+    private var collisionListener: GameCollisionListener
     private var playerNum = 0
     private var powerUpList = ArrayList<PowerUp>()
-    private var obstacleList = ArrayList<Obstacle>()
     private var isSplitGame = false
     private var colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
 
@@ -96,24 +96,16 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     }
 
     override fun keyPressed(e: KeyEvent?) {
-        for (paddle in gameObjectList) {
-            when (paddle) {
-                is Paddle -> {
-                    if (e?.keyCode == paddle.leftKey) paddle.leftPress = true
-                    if (e?.keyCode == paddle.rightKey) paddle.rightPress = true
-                }
-            }
+        for (paddle in gameObjectList.filterIsInstance<Paddle>()) {
+            if (e?.keyCode == paddle.leftKey) paddle.leftPress = true
+            if (e?.keyCode == paddle.rightKey) paddle.rightPress = true
         }
     }
 
     override fun keyReleased(e: KeyEvent?) {
-        for (paddle in gameObjectList) {
-            when (paddle) {
-                is Paddle -> {
-                    if (e?.keyCode == paddle.leftKey) paddle.leftPress = false
-                    if (e?.keyCode == paddle.rightKey) paddle.rightPress = false
-                }
-            }
+        for (paddle in gameObjectList.filterIsInstance<Paddle>()) {
+            if (e?.keyCode == paddle.leftKey) paddle.leftPress = false
+            if (e?.keyCode == paddle.rightKey) paddle.rightPress = false
         }
     }
 
@@ -125,17 +117,8 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         val g2d = g as Graphics2D
         super.paintComponent(g2d)
 
-        val obstacles = ArrayList(obstacleList)
         val powerUps = ArrayList(powerUpList)
         val gameObjects = ArrayList(gameObjectList)
-
-        for (obstacle in obstacles) {
-            g2d.color = Color.BLACK
-            g2d.fill(Rectangle2D.Double(obstacle.xPosition - 2, obstacle.yPosition - 2, obstacle.width + 4, obstacle.height + 4))
-
-            g2d.color = colors[2]
-            g2d.fill(Rectangle2D.Double(obstacle.xPosition, obstacle.yPosition, obstacle.width, obstacle.height))
-        }
 
         for(powerUp in powerUps) {
             g2d.color = Color.BLACK
@@ -156,6 +139,14 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                 1 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition, this.height - 10.0, 50.0, 10.0))
                 2 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition, 0.0, 50.0, 10.0))
             }
+        }
+
+        for (obstacle in gameObjectList.filterIsInstance<Obstacle>()) {
+            g2d.color = Color.BLACK
+            g2d.fill(Rectangle2D.Double(obstacle.xPosition - 2, obstacle.yPosition - 2, obstacle.width + 4, obstacle.height + 4))
+
+            g2d.color = colors[2]
+            g2d.fill(Rectangle2D.Double(obstacle.xPosition, obstacle.yPosition, obstacle.width, obstacle.height))
         }
 
         for (gameObject in gameObjects) {
@@ -286,7 +277,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                         }
                     }
 
-                    for (obstacle in obstacleList) doObstacleLogic(gameObject, obstacle)
+                    for (obstacle in gameObjectList.filterIsInstance<Obstacle>()) doObstacleLogic(gameObject, obstacle)
                 }
 
                 is Paddle -> {
@@ -423,6 +414,8 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         scoreLabel2.setBounds(0, 0, 200, 50)
         player1Gain = 0
         player2Gain = 0
+
+        GameCollisionListener(this.width, this.height)
 
         winLabel.isVisible = false
         winLabel1.isVisible = false
@@ -563,7 +556,6 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     fun setPlayers(playerNum: Int) { this.playerNum = playerNum }
     fun setGameListener(listener: GameListener) { this.gameManager = listener }
     fun setPowerUpList(list: ArrayList<PowerUp>) { this.powerUpList = list }
-    fun setObstacleList(list: ArrayList<Obstacle>) { this.obstacleList = list }
     fun setSplitGame(sg: Boolean) { this.isSplitGame = sg }
     fun setColors(colors: Array<Color>) { this.colors = colors }
 }
