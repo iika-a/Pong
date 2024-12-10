@@ -31,18 +31,18 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private val cards = CardLayout()
     private val gameButtonsPanel = JPanel(cards)
     private val settingsButtonsPanel = JPanel(cards)
-    private val menuFont = Font("Segoe UI", 0, 18)
+    private val menuFont = Font("Segoe UI", 0, 30)
     private var currentKeybindButton: JButton = JButton()
     private var isChangingKeybind = false
     private var formerButtonText = ""
 
-    private val backButton = JButton("Back").apply { setButtonSettings(this); font = font.deriveFont(14f); preferredSize = Dimension(50, 30) }
-    private val resetButton = JButton("Reset Scores").apply { setButtonSettings(this); font = font.deriveFont(14f); preferredSize = Dimension(105, 30) }
-    private val scoreLabel = JLabel("Player 1 Score: ${scoreKeeper.score1}              Player 2 Score: ${scoreKeeper.score2}").apply { font = menuFont.deriveFont(14f) }
+    private val backButton = JButton("Back").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(75, 45) }
+    private val resetButton = JButton("Reset Scores").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(210, 45) }
+    private val scoreLabel = JLabel("Player 1 Score: ${scoreKeeper.score1}              Player 2 Score: ${scoreKeeper.score2}").apply { font = menuFont.deriveFont(20f) }
 
-    private val settingsBackButton = JButton("Back").apply { setButtonSettings(this); font = font.deriveFont(14f); preferredSize = Dimension(50, 30) }
-    private val settingsKeybindsButton = JButton("Controls").apply { setButtonSettings(this); font = font.deriveFont(14f); preferredSize = Dimension(75, 30) }
-    private val settingsColorsButton = JButton("Colors").apply { setButtonSettings(this); font = font.deriveFont(14f); preferredSize = Dimension(60, 30) }
+    private val settingsBackButton = JButton("Back").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(100, 45) }
+    private val settingsKeybindsButton = JButton("Controls").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(150, 45) }
+    private val settingsColorsButton = JButton("Colors").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(120, 45) }
 
     private val player1ColorButton = JButton("Player 1").apply { setButtonSettings(this) }
     private val player2ColorButton = JButton("Player 2").apply { setButtonSettings(this) }
@@ -70,12 +70,12 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private val resetKeybindsButton = JButton("Reset to Defaults").apply { setButtonSettings(this) }
     private val keybindButtonArray = arrayOf(player1Paddle1LeftButton, player1Paddle1RightButton, player1Paddle2LeftButton, player1Paddle2RightButton, player2Paddle1LeftButton, player2Paddle1RightButton, player2Paddle2LeftButton, player2Paddle2RightButton)
 
-    private val player1KeybindLabel = JLabel("Player 1").apply { font = menuFont.deriveFont(24f) }
-    private val player1Paddle1Label = JLabel("Paddle 1").apply { font = menuFont.deriveFont(19f); horizontalAlignment = JLabel.LEFT; preferredSize = Dimension(223, 25) }
-    private val player1Paddle2Label = JLabel("Paddle 2").apply { font = menuFont.deriveFont(19f); horizontalAlignment = JLabel.RIGHT; preferredSize = Dimension(223, 25) }
-    private val player2KeybindLabel = JLabel("Player 2").apply { font = menuFont.deriveFont(24f) }
-    private val player2Paddle1Label = JLabel("Paddle 1").apply { font = menuFont.deriveFont(19f); horizontalAlignment = JLabel.LEFT; preferredSize = Dimension(223, 25) }
-    private val player2Paddle2Label = JLabel("Paddle 2").apply { font = menuFont.deriveFont(19f); horizontalAlignment = JLabel.RIGHT; preferredSize = Dimension(223, 25) }
+    private val player1KeybindLabel = JLabel("Player 1").apply { font = menuFont.deriveFont(28f) }
+    private val player1Paddle1Label = JLabel("Paddle 1").apply { font = menuFont.deriveFont(23f); horizontalAlignment = JLabel.LEFT; preferredSize = Dimension(320, 25) }
+    private val player1Paddle2Label = JLabel("Paddle 2").apply { font = menuFont.deriveFont(23f); horizontalAlignment = JLabel.RIGHT; preferredSize = Dimension(320, 25) }
+    private val player2KeybindLabel = JLabel("Player 2").apply { font = menuFont.deriveFont(28f) }
+    private val player2Paddle1Label = JLabel("Paddle 1").apply { font = menuFont.deriveFont(23f); horizontalAlignment = JLabel.LEFT; preferredSize = Dimension(320, 25) }
+    private val player2Paddle2Label = JLabel("Paddle 2").apply { font = menuFont.deriveFont(23f); horizontalAlignment = JLabel.RIGHT; preferredSize = Dimension(320, 25) }
 
     private val powerUpLabel = JLabel("Selected Power Ups:").apply { font = menuFont; horizontalAlignment = JLabel.CENTER }
     private val increasePaddleSizeBox = JCheckBox("Increase Paddle Size", true).apply { setBoxSettings(this) }
@@ -157,7 +157,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
         panel.add(backButton)
         panel.add(resetButton)
-        panel.preferredSize = Dimension(720, 45)
+        panel.preferredSize = Dimension(720, 60)
 
         return panel
     }
@@ -165,7 +165,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private fun createSettingsBottomPanel(): JPanel {
         val panel = JPanel(FlowLayout(FlowLayout.CENTER, 10, 10))
         panel.add(settingsBackButton)
-        panel.preferredSize = Dimension(720, 45)
+        panel.preferredSize = Dimension(720, 60)
 
         return panel
     }
@@ -195,7 +195,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private fun createMainMenu(): JPanel {
         val panel = JPanel(GridBagLayout())
         val mainLabel = JLabel("iika's Pong").apply { font = menuFont }
-        val versionLabel = JLabel("version 1.1").apply { font = menuFont.deriveFont(12f) }
+        val versionLabel = JLabel("version 1.2").apply { font = menuFont.deriveFont(18f) }
         versionLabel.horizontalAlignment = JLabel.CENTER
         mainLabel.horizontalAlignment = JLabel.CENTER
 
@@ -395,8 +395,8 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     }
 
     private fun setButtonSettings(button: JButton) {
-        val buttonSize = Dimension(185, 60)
-        val menuFont = Font("Segoe UI", 0, 18)
+        val buttonSize = Dimension(275, 85)
+        val menuFont = Font("Segoe UI", 0, 26)
         val buttonColor = Color(0xD1F6FF)
         val buttonBorder = LineBorder(Color.WHITE, 3)
 
@@ -409,8 +409,8 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     }
 
     private fun setLabelSettings(label: JLabel) {
-        val labelSize = Dimension(185, 60)
-        val menuFont = Font("Segoe UI", 0, 18)
+        val labelSize = Dimension(275, 85)
+        val menuFont = Font("Segoe UI", 0, 28)
         val labelBorder = LineBorder(Color.BLACK, 3)
 
         label.preferredSize = labelSize
@@ -421,7 +421,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     }
 
     private fun setBoxSettings(box: JCheckBox) {
-        box.font = menuFont.deriveFont(14f)
+        box.font = menuFont.deriveFont(18f)
         box.background = Color(0xFFD1DC)
         box.addItemListener(this)
     }

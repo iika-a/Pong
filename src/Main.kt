@@ -29,9 +29,10 @@ fun main() {
 
     SwingUtilities.invokeLater {
         val gameFrame = JFrame("iika's Pong")
-        gameFrame.setSize(1280, 720)
+        gameFrame.setSize(1920, 1080)
         gameFrame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         gameFrame.isResizable = false
+        gameFrame.isUndecorated = true
 
         val buttonMouseListener = ButtonMouseListener()
 

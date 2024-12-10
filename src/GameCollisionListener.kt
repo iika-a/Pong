@@ -4,37 +4,39 @@ import kotlin.math.sin
 import kotlin.math.sign
 import kotlin.random.Random
 
-class GameCollisionListener(private val width: Int, private val height: Int): CollisionListener {
-    override fun onCollision(event: CollisionEvent, obj1: GameObject, obj2: GameObject, gameObjectList: ArrayList<GameObject>) {
+class GameCollisionListener: CollisionListener {
+    override fun onCollision(event: CollisionEvent, obj1: GameObject, obj2: GameObject, intersect: Double, gameObjectList: ArrayList<GameObject>) {
         when (event) {
             CollisionEvent.BALL_PADDLE -> {
                 obj1.yVelocity *= -1
-                obj1.yPosition += 2 * obj1.yVelocity.sign
+                obj1.yPosition += intersect * obj1.yVelocity.sign
             }
             CollisionEvent.BALL_WALL -> {
                 obj1.xVelocity *= -1
-                if(obj1.xPosition < 0 || obj1.xPosition + 2 * obj1.width > width)obj1.xPosition += 2 * obj1.xVelocity.sign
+                obj1.xPosition += intersect * obj1.xVelocity.sign
             }
             CollisionEvent.BALL_OBSTACLE_SIDE -> {
-                TODO("finish collision listener")
                 obj1.xVelocity *= -1
-                obj1.xPosition += 2 * obj1.xVelocity.sign
+                obj1.xPosition += intersect * obj1.xVelocity.sign
             }
             CollisionEvent.BALL_OBSTACLE_TOP_BOTTOM -> {
                 obj1.yVelocity *= -1
-                obj1.yPosition += 2 * obj1.yVelocity.sign
+                obj1.yPosition += intersect * obj1.yVelocity.sign
             }
             CollisionEvent.BALL_BALL_SIDE -> {
                 obj1.xVelocity *= -1
-                obj1.xPosition += 2 * obj1.xVelocity.sign
+                obj1.xPosition += intersect * obj1.xVelocity.sign
                 obj2.xVelocity *= -1
-                obj2.xPosition += 2 * obj2.xVelocity.sign
+                obj2.xPosition += -intersect * obj2.xVelocity.sign
             }
             CollisionEvent.BALL_BALL_TOP_BOTTOM -> {
                 obj1.yVelocity *= -1
-                obj1.yPosition += 2 * obj1.yVelocity.sign
+                obj1.yPosition += intersect * obj1.yVelocity.sign
                 obj2.yVelocity *= -1
-                obj2.yPosition += 2 * obj2.yVelocity.sign
+                obj2.yPosition += -intersect * obj2.yVelocity.sign
+            }
+            CollisionEvent.PADDLE_WALL -> {
+                obj1.xPosition += intersect
             }
             CollisionEvent.PADDLE_POWERUP -> applyPowerUp(obj1 as Paddle, obj2 as PowerUp, gameObjectList)
         }
@@ -61,6 +63,15 @@ class GameCollisionListener(private val width: Int, private val height: Int): Co
                     isTemporary = true))
             }
         }
+    }
+
+    fun checkIntersect(obj1: GameObject, obj2: GameObject): Boolean {
+        val result = obj1.xPosition < obj2.xPosition + obj2.width &&
+                obj1.xPosition + obj1.width > obj2.xPosition &&
+                obj1.yPosition < obj2.yPosition + obj2.height &&
+                obj1.yPosition + obj1.height > obj2.yPosition
+        if (obj2.yPosition == 0.0) println("$result \n-------")
+        return result
     }
 
     private fun getRandomAngle(): Double {

@@ -8,4 +8,4 @@ data class Paddle (
     val side: Int = 0,
     var leftKey: Int = 0,
     var rightKey: Int = 0
-): GameObject(xPos, if (side == 1) 720 - paddleHeight else 0.0, 0.0, 0.0, paddleWidth, paddleHeight)
+): GameObject(xPos, if (side == 1) 1080 - paddleHeight else 0.0, 0.0, 0.0, paddleWidth, paddleHeight)

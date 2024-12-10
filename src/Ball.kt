@@ -8,4 +8,4 @@ data class Ball (
     var ballSpeed: Double = 0.0,
     var processed: Boolean = false,
     val isTemporary: Boolean = false
-): GameObject(xPos, yPos, xVel, yVel, ballRadius, ballRadius)
+): GameObject(xPos, yPos, xVel, yVel, ballRadius * 2, ballRadius * 2)

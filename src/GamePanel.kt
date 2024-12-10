@@ -14,6 +14,7 @@ import javax.swing.border.LineBorder
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.min
 import kotlin.random.Random
 
 class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), KeyListener {
@@ -31,7 +32,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     private val exitButton = JButton("Return to Menu").apply { setButtonSettings(this) }
     private val continueButton = JButton("Continue Game").apply { setButtonSettings(this) }
     private var gameManager: GameListener? = null
-    private var collisionListener: GameCollisionListener
+    private var collisionListener: GameCollisionListener = GameCollisionListener()
     private var playerNum = 0
     private var powerUpList = ArrayList<PowerUp>()
     private var isSplitGame = false
@@ -153,9 +154,9 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             when (gameObject) {
                 is Ball -> {
                     g2d.color = Color.BLACK
-                    g2d.fill(Ellipse2D.Double(gameObject.xPosition - 2, gameObject.yPosition - 2, 2 * gameObject.ballRadius + 4, 2 * gameObject.ballRadius + 4))
+                    g2d.fill(Ellipse2D.Double(gameObject.xPosition - 2, gameObject.yPosition - 2, gameObject.width + 4, gameObject.height + 4))
                     g2d.color = colors[3]
-                    g2d.fill(Ellipse2D.Double(gameObject.xPosition, gameObject.yPosition, 2 * gameObject.ballRadius, 2 * gameObject.ballRadius))
+                    g2d.fill(Ellipse2D.Double(gameObject.xPosition, gameObject.yPosition, gameObject.width, gameObject.height))
                 }
 
                 is Paddle -> {
@@ -179,9 +180,9 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
 
         if (checkForLoss() != 0 || checkForWin() != 0) {
             g2d.color = Color.BLACK
-            g2d.fill(Rectangle2D.Double(this.width/2 - 125 - 2.0, this.height/2 - 35 - 2.0, 254.0, 189.0))
+            g2d.fill(Rectangle2D.Double(this.width/2 - 200 - 2.0, this.height/2 - 70 - 2.0, 504.0, 209.0))
             g2d.color = Color(0xFFD1DC)
-            g2d.fill(Rectangle2D.Double(this.width/2 - 125.0, this.height/2 - 35.0, 250.0, 185.0))
+            g2d.fill(Rectangle2D.Double(this.width/2 - 200.0, this.height/2 - 70.0, 500.0, 205.0))
         }
     }
 
@@ -247,105 +248,48 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         for (gameObject in gameObjectList) {
             when (gameObject) {
                 is Ball -> {
-                    if (gameObject.xPosition <= 0 || gameObject.xPosition + 2 * gameObject.ballRadius >= this.width) {
-                        gameObject.xVelocity *= -1
-                        if (gameObject.xPosition <= 0) gameObject.xPosition += 2
-                        if (gameObject.xPosition + 2 * gameObject.ballRadius >= this.width) gameObject.xPosition -= 2
+                    if (gameObject.xPosition <= 0 || gameObject.xPosition + gameObject.width >= this.width) {
+                        val wallIntersect = if (gameObject.xPosition <= 0) 0 - gameObject.xPosition
+                        else gameObject.xPosition + gameObject.width - this.width
+
+                        collisionListener.onCollision(event = CollisionEvent.BALL_WALL, obj1 = gameObject, intersect =  wallIntersect)
                     }
 
                     for (otherObject in gameObjectList) {
-                        if (otherObject is Ball) {
-                            if (otherObject != gameObject) doObstacleLogic(gameObject, otherObject)
-                        }
+                        if (gameObject != otherObject && collisionListener.checkIntersect(gameObject, otherObject)) {
+                            val xIntersect = min(gameObject.xPosition + gameObject.width - otherObject.xPosition, otherObject.xPosition + otherObject.width - gameObject.xPosition)
+                            val yIntersect = min(gameObject.yPosition + gameObject.height - otherObject.yPosition, otherObject.yPosition + otherObject.height - gameObject.yPosition)
 
-                        if (otherObject is Paddle) {
-                            val paddleTop = if (otherObject.side == 1) this.height - otherObject.paddleHeight else 0.0
-                            val paddleBottom = paddleTop + otherObject.paddleHeight
-
-                            if (gameObject.yPosition + 2 * gameObject.ballRadius >= paddleTop &&
-                                gameObject.yPosition <= paddleBottom &&
-                                gameObject.xPosition + gameObject.ballRadius >= otherObject.xPosition &&
-                                gameObject.xPosition <= otherObject.xPosition + otherObject.paddleWidth
-                            ) {
-                                gameObject.yVelocity *= -1
-                                if (otherObject.side == 1) {
-                                    gameObject.yPosition = paddleTop - 2 * gameObject.ballRadius - 1
-                                } else {
-                                    gameObject.yPosition = paddleBottom + 1
+                            when (otherObject) {
+                                is Ball -> {
+                                    if (xIntersect < yIntersect) collisionListener.onCollision(CollisionEvent.BALL_BALL_SIDE, gameObject, otherObject, xIntersect)
+                                    else collisionListener.onCollision(CollisionEvent.BALL_BALL_TOP_BOTTOM, gameObject, otherObject, yIntersect)
+                                }
+                                is Paddle -> collisionListener.onCollision(CollisionEvent.BALL_PADDLE, gameObject, otherObject, yIntersect)
+                                is Obstacle -> {
+                                    if (xIntersect < yIntersect) collisionListener.onCollision(CollisionEvent.BALL_OBSTACLE_SIDE, gameObject, otherObject, xIntersect)
+                                    else collisionListener.onCollision(CollisionEvent.BALL_OBSTACLE_TOP_BOTTOM, gameObject, otherObject, yIntersect)
                                 }
                             }
                         }
                     }
-
-                    for (obstacle in gameObjectList.filterIsInstance<Obstacle>()) doObstacleLogic(gameObject, obstacle)
                 }
 
                 is Paddle -> {
-                    if (gameObject.xPosition < 0) gameObject.xPosition = 0.0
-                    if (gameObject.xPosition + gameObject.paddleWidth > this.width) gameObject.xPosition = this.width - gameObject.paddleWidth
-                }
-            }
-        }
+                    if (gameObject.xPosition <= 0 || gameObject.xPosition + gameObject.width >= this.width) {
+                        val wallIntersect = if (gameObject.xPosition <= 0) 0 - gameObject.xPosition
+                        else gameObject.xPosition + gameObject.width - this.width
 
-        doPowerUpLogic()
-    }
+                        collisionListener.onCollision(event = CollisionEvent.PADDLE_WALL, obj1 = gameObject, intersect =  wallIntersect)
+                    }
 
-    private fun doObstacleLogic(ball: Ball, collisionObject: GameObject) {
-        val ballLeft = ball.xPosition
-        val ballRight = ball.xPosition + 2 * ball.ballRadius
-        val ballTop = ball.yPosition
-        val ballBottom = ball.yPosition + 2 * ball.ballRadius
-
-        val obstacleLeft = collisionObject.xPosition
-        val obstacleRight = collisionObject.xPosition + collisionObject.width
-        val obstacleTop = collisionObject.yPosition
-        val obstacleBottom = collisionObject.yPosition + collisionObject.height
-
-        if (ballRight > obstacleLeft && ballLeft < obstacleRight && ballBottom > obstacleTop && ballTop < obstacleBottom) {
-            if (ballLeft < obstacleLeft) {
-                ball.xVelocity *= -1
-                ball.xPosition = obstacleLeft - 2 * ball.ballRadius
-            } else if (ballRight > obstacleRight) {
-                ball.xVelocity *= -1
-                ball.xPosition = obstacleRight
-            } else if (ballTop < obstacleTop) {
-                ball.yVelocity *= -1
-                ball.yPosition = obstacleTop - 2 * ball.ballRadius
-            } else if (ballBottom > obstacleBottom) {
-                ball.yVelocity *= -1
-                ball.yPosition = obstacleBottom
-            }
-        }
-    }
-
-    private fun doPowerUpLogic() {
-        val iterator = powerUpList.iterator()
-        while (iterator.hasNext()) {
-            val powerUp = iterator.next()
-
-            var powerUpConsumed = false
-
-            for (gameObject in gameObjectList) {
-                if (gameObject is Paddle) {
-                    val paddleLeft = gameObject.xPosition
-                    val paddleRight = gameObject.xPosition + gameObject.paddleWidth
-                    val powerUpLeft = powerUp.xPosition
-                    val powerUpRight = powerUp.xPosition + 50
-
-                    if (((powerUpLeft in paddleLeft..paddleRight) || (powerUpRight in paddleLeft..paddleRight)) && powerUp.side == gameObject.side) {
-                        applyPowerup(gameObject, powerUp.type)
-                        powerUpConsumed = true
-                        break
+                    for (powerUp in powerUpList) {
+                        if (gameObject.xPosition in powerUp.xPosition..powerUp.xPosition + powerUp.width && gameObject.side == powerUp.side) collisionListener.onCollision(CollisionEvent.PADDLE_POWERUP, gameObject, powerUp, 0.0, gameObjectList)
                     }
                 }
             }
-
-            if (powerUpConsumed) {
-                iterator.remove()
-            }
         }
     }
-
 
     fun initializeBall() {
         var i = 0
@@ -374,30 +318,33 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     fun initializePaddles(paddleNum: Int = 0) {
         var i = 0
 
-        for (gameObject in gameObjectList) {
-            if (playerNum == 2 && gameObject is Paddle) {
-                if (paddleNum == 0 || gameObject.side == paddleNum) {
-                    gameObject.paddleWidth = 100.0
-                    gameObject.paddleSpeed = 625.0
-                    gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
+        for (paddle in gameObjectList.filterIsInstance<Paddle>()) {
+            if (playerNum == 2) {
+                if (paddleNum == 0 || paddle.side == paddleNum) {
+                    paddle.paddleWidth = 100.0
+                    paddle.paddleSpeed = 625.0
+                    paddle.xPosition = this.width / 2 - paddle.paddleWidth / 2
                 }
-                if (gameObject.side == 1 && !isSplitGame) gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
-                if (isSplitGame && i % 2 == 0) gameObject.xPosition = this.width / 2 - this.width / 4 - gameObject.paddleWidth / 2
-                if (isSplitGame && i++ % 2 == 1) gameObject.xPosition = this.width / 2 + this.width / 4 - gameObject.paddleWidth / 2
-            } else if (playerNum == 1 && gameObject is Paddle) {
-                if (gameObject.side == 2) {
-                    gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
-                    gameObject.paddleWidth = 2000.0
-                    gameObject.paddleSpeed = 0.0
-                } else if (gameObject.side == 1) {
-                    gameObject.xPosition = this.width / 2 - gameObject.paddleWidth / 2
+                if (paddle.side == 1 && !isSplitGame) paddle.xPosition = this.width / 2 - paddle.paddleWidth / 2
+                if (isSplitGame && i % 2 == 0) paddle.xPosition = this.width / 2 - this.width / 4 - paddle.paddleWidth / 2
+                if (isSplitGame && i++ % 2 == 1) paddle.xPosition = this.width / 2 + this.width / 4 - paddle.paddleWidth / 2
+            } else if (playerNum == 1) {
+                if (paddle.side == 2) {
+                    paddle.xPosition = this.width / 2 - paddle.paddleWidth / 2
+                    paddle.paddleWidth = 2000.0
+                    paddle.paddleSpeed = 0.0
+                } else if (paddle.side == 1) {
+                    paddle.xPosition = this.width / 2 - paddle.paddleWidth / 2
 
-                    gameObject.paddleWidth = 100.0
-                    gameObject.paddleSpeed = 625.0
-                    if (isSplitGame && i % 2 == 0) gameObject.xPosition = this.width / 2 + this.width / 4 - gameObject.paddleWidth / 2
-                    if (isSplitGame && i++ % 2 == 1) gameObject.xPosition = this.width / 2 - this.width / 4 - gameObject.paddleWidth / 2
+                    paddle.paddleWidth = 100.0
+                    paddle.paddleSpeed = 625.0
+                    if (isSplitGame && i % 2 == 0) paddle.xPosition = this.width / 2 + this.width / 4 - paddle.paddleWidth / 2
+                    if (isSplitGame && i++ % 2 == 1) paddle.xPosition = this.width / 2 - this.width / 4 - paddle.paddleWidth / 2
                 }
             }
+
+            if (paddle.side == 1) paddle.yPosition = this.height - paddle.paddleHeight
+            else paddle.yPosition = 0.0
         }
     }
 
@@ -414,8 +361,6 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         scoreLabel2.setBounds(0, 0, 200, 50)
         player1Gain = 0
         player2Gain = 0
-
-        GameCollisionListener(this.width, this.height)
 
         winLabel.isVisible = false
         winLabel1.isVisible = false
@@ -508,29 +453,6 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         }
 
         return 0
-    }
-
-    private fun applyPowerup(paddle: Paddle, type: PowerUpType) {
-        when (type) {
-            PowerUpType.INCREASE_PADDLE_SIZE -> paddle.paddleWidth += (15..25).random()
-            PowerUpType.INCREASE_PADDLE_SPEED -> paddle.paddleSpeed += 100
-            PowerUpType.RANDOMIZE_BALL_ANGLE -> gameObjectList.filterIsInstance<Ball>().random().velocityAngle = getRandomAngle()
-            PowerUpType.RANDOMIZE_BALL_SPEED -> gameObjectList.filterIsInstance<Ball>().random().ballSpeed = (475..625).random().toDouble()
-            PowerUpType.SPAWN_BALL -> {
-            val velocityAngle = getRandomAngle() + if((0..1).random() == 1) PI else 0.0
-            val ballSpeed = (550..600).random().toDouble()
-            val xVelocity = ballSpeed * cos(velocityAngle)
-            val yVelocity = ballSpeed * sin(velocityAngle)
-            gameObjectList.add(Ball(
-                xPos = ((this.width/3)..(2 * this.width/3)).random().toDouble(),
-                yPos = this.height/2.0,
-                velocityAngle = velocityAngle,
-                ballSpeed = ballSpeed,
-                xVel = xVelocity,
-                yVel = yVelocity,
-                isTemporary = true))
-            }
-        }
     }
 
     private fun refreshScore() {
