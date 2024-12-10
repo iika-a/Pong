@@ -1,6 +1,6 @@
 data class Paddle (
     val xPos: Double = 0.0,
-    var paddleWidth: Double = 100.0,
+    var paddleWidth: Double = 150.0,
     val paddleHeight: Double = 5.0,
     var paddleSpeed: Double = 10.0,
     var leftPress: Boolean = false,

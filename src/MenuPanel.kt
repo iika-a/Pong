@@ -36,13 +36,13 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private var isChangingKeybind = false
     private var formerButtonText = ""
 
-    private val backButton = JButton("Back").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(75, 45) }
-    private val resetButton = JButton("Reset Scores").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(210, 45) }
+    private val backButton = JButton("Back").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(80, 45) }
+    private val resetButton = JButton("Reset Scores").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(180, 45) }
     private val scoreLabel = JLabel("Player 1 Score: ${scoreKeeper.score1}              Player 2 Score: ${scoreKeeper.score2}").apply { font = menuFont.deriveFont(20f) }
 
-    private val settingsBackButton = JButton("Back").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(100, 45) }
-    private val settingsKeybindsButton = JButton("Controls").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(150, 45) }
-    private val settingsColorsButton = JButton("Colors").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(120, 45) }
+    private val settingsBackButton = JButton("Back").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(80, 45) }
+    private val settingsKeybindsButton = JButton("Controls").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(125, 45) }
+    private val settingsColorsButton = JButton("Colors").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(100, 45) }
 
     private val player1ColorButton = JButton("Player 1").apply { setButtonSettings(this) }
     private val player2ColorButton = JButton("Player 2").apply { setButtonSettings(this) }
@@ -239,7 +239,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         val confirmLabel = JLabel("Selected Options:").apply { font = menuFont }
         confirmLabel.horizontalAlignment = JLabel.CENTER
 
-        val scrollPane = JScrollPane(JList(gameOptionList).apply { font = menuFont.deriveFont(12f) })
+        val scrollPane = JScrollPane(JList(gameOptionList).apply { font = menuFont.deriveFont(18f) })
 
         val constraints = GridBagConstraints().apply {
             gridx = 0
@@ -258,15 +258,15 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
     private fun createOptionsMenu(): JPanel {
         val panel = JPanel(BorderLayout()).apply { background = Color(0xFFD1DC) }
-        val buttonPanel = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC) }
+        val buttonPanel = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC); preferredSize = Dimension(1350, 450) }
         val buttonPanel1 = JPanel(FlowLayout()).apply { background = Color(0xFFD1DC) }
         val buttonPanel2 = JPanel(FlowLayout()).apply { background = Color(0xFFD1DC) }
         val buttonPanel3 = JPanel(FlowLayout()).apply { background = Color(0xFFD1DC) }
         val buttonPanel4 = JPanel(FlowLayout()).apply { background = Color(0xFFD1DC) }
-        val sidePanel = JPanel(BorderLayout()).apply { background = Color(0xFFD1DC); preferredSize = Dimension(400, 450) }
-        val checkBoxPanel  = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC) }
-        val scrollPane = JScrollPane(JList(gameOptionList).apply { font = menuFont.deriveFont(12f) }).apply { preferredSize = Dimension(200, 400) }
-        val panePanel = JPanel(BorderLayout()).apply { background = Color(0xFFD1DC) }
+        val sidePanel = JPanel(BorderLayout()).apply { background = Color(0xFFD1DC); preferredSize = Dimension(550, 450) }
+        val checkBoxPanel  = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC); preferredSize = Dimension(300, 450) }
+        val scrollPane = JScrollPane(JList(gameOptionList).apply { font = menuFont.deriveFont(18f) }).apply { preferredSize = Dimension(200, 400) }
+        val panePanel = JPanel(BorderLayout()).apply { background = Color(0xFFD1DC); preferredSize = Dimension(250, 450) }
 
         val modeLabel = JLabel("Game Modes", JLabel.CENTER).apply { font = menuFont }
         val mapLabel = JLabel("Game Maps", JLabel.CENTER).apply { font = menuFont }
@@ -322,8 +322,8 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         sidePanel.add(panePanel, BorderLayout.EAST)
         sidePanel.add(checkBoxPanel, BorderLayout.WEST)
 
-        panel.add(sidePanel, BorderLayout.EAST)
-        panel.add(buttonPanel, BorderLayout.CENTER)
+        panel.add(sidePanel, BorderLayout.CENTER)
+        panel.add(buttonPanel, BorderLayout.WEST)
 
         return panel
     }
@@ -421,7 +421,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     }
 
     private fun setBoxSettings(box: JCheckBox) {
-        box.font = menuFont.deriveFont(18f)
+        box.font = menuFont.deriveFont(20f)
         box.background = Color(0xFFD1DC)
         box.addItemListener(this)
     }

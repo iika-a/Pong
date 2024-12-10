@@ -31,8 +31,7 @@ fun main() {
         val gameFrame = JFrame("iika's Pong")
         gameFrame.setSize(1920, 1080)
         gameFrame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-        gameFrame.isResizable = false
-        gameFrame.isUndecorated = true
+        gameFrame.isResizable = false 
 
         val buttonMouseListener = ButtonMouseListener()
 
