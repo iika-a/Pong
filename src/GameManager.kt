@@ -1,12 +1,11 @@
 import java.awt.Color
 import java.awt.event.KeyEvent
-import java.util.ArrayList
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.swing.DefaultListModel
 
-class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: ArrayList<GameObject>): GameListener {
+class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: CopyOnWriteArrayList<GameObject>): GameListener {
     private var playerNum = 0
-    private val powerUpList = ArrayList<PowerUp>()
-    private val obstacleList = ArrayList<Obstacle>()
+    private val powerUpList = CopyOnWriteArrayList<PowerUp>()
     private val colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
     private val keybinds = arrayOf(KeyEvent.VK_COMMA, KeyEvent.VK_SLASH, KeyEvent.VK_F, KeyEvent.VK_H)
     private val gameLoop = GameLoop(gamePanel, powerUpList)
@@ -89,7 +88,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
                     gameObjectList.add(Paddle(side = 1, leftKey = keybinds[0], rightKey = keybinds[1]))
                     if (playerNum == 2) gameObjectList.add(Paddle(side = 2, leftKey = keybinds[2], rightKey = keybinds[3]))
                     gameObjectList.add(Ball())
-                    obstacleList.add(Obstacle(gamePanel.width / 2 - 5.0, 0.0, 10.0, gamePanel.height.toDouble()))
+                    gameObjectList.add(Obstacle(gamePanel.width / 2 - 5.0, 0.0, 10.0, gamePanel.height.toDouble()))
                 }
                 null -> throw NoWhenBranchMatchedException("Invalid Game Option")
             }
@@ -100,6 +99,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
             2 -> scoreKeeper.score2 += 1
         }
 
+        gameObjectList.add(Ball())
         powerUpList.clear()
         gamePanel.initializeBall()
         gamePanel.initializePaddles(paddleNum)
@@ -112,7 +112,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
     private fun doMenu() {
         for (i in gameObjectList.lastIndex downTo 3) gameObjectList.removeAt(i)
         gamePanel.setSplitGame(false)
-        obstacleList.clear()
         gamePanel.isVisible = false
         menuPanel.doMenu()
     }

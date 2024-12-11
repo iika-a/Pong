@@ -6,7 +6,7 @@ import java.awt.geom.Rectangle2D
 import java.awt.geom.Ellipse2D
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
-import java.util.ArrayList
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -17,7 +17,7 @@ import kotlin.math.sin
 import kotlin.math.min
 import kotlin.random.Random
 
-class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), KeyListener {
+class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), KeyListener {
     private var player1Gain = 0
     private var player2Gain = 0
     private val gameFont = Font("Segoe UI", 0, 14)
@@ -34,7 +34,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     private var gameManager: GameListener? = null
     private var collisionListener: GameCollisionListener = GameCollisionListener()
     private var playerNum = 0
-    private var powerUpList = ArrayList<PowerUp>()
+    private var powerUpList = CopyOnWriteArrayList<PowerUp>()
     private var isSplitGame = false
     private var colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
 
@@ -118,10 +118,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         val g2d = g as Graphics2D
         super.paintComponent(g2d)
 
-        val powerUps = ArrayList(powerUpList)
-        val gameObjects = ArrayList(gameObjectList)
-
-        for(powerUp in powerUps) {
+        for(powerUp in powerUpList) {
             g2d.color = Color.BLACK
             when (powerUp.side) {
                 1 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition - 2, this.height - 10 - 2.0, 54.0, 12.0))
@@ -150,7 +147,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             g2d.fill(Rectangle2D.Double(obstacle.xPosition, obstacle.yPosition, obstacle.width, obstacle.height))
         }
 
-        for (gameObject in gameObjects) {
+        for (gameObject in gameObjectList) {
             when (gameObject) {
                 is Ball -> {
                     g2d.color = Color.BLACK
@@ -163,15 +160,15 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                     g2d.color = Color.BLACK
                     when (gameObject.side) {
                         2 -> {
-                            g2d.fill(Rectangle2D.Double(gameObject.xPosition - 2, 0.0, gameObject.paddleWidth + 4, gameObject.paddleHeight + 2))
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition - 2, 0.0, gameObject.width + 4, gameObject.paddleHeight + 2))
                             g2d.color = colors[1]
-                            g2d.fill(Rectangle2D.Double(gameObject.xPosition, 0.0, gameObject.paddleWidth, gameObject.paddleHeight))
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition, 0.0, gameObject.width, gameObject.paddleHeight))
                         }
 
                         1 -> {
-                            g2d.fill(Rectangle2D.Double(gameObject.xPosition - 2, this.height - gameObject.paddleHeight - 2, gameObject.paddleWidth + 4, gameObject.paddleHeight + 4))
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition - 2, this.height - gameObject.paddleHeight - 2, gameObject.width + 4, gameObject.paddleHeight + 4))
                             g2d.color = colors[0]
-                            g2d.fill(Rectangle2D.Double(gameObject.xPosition, this.height - gameObject.paddleHeight, gameObject.paddleWidth, gameObject.paddleHeight))
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition, this.height - gameObject.paddleHeight, gameObject.width, gameObject.paddleHeight))
                         }
                     }
                 }
@@ -199,6 +196,12 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                     if (gameObject.rightPress) gameObject.move(gameObject.paddleSpeed * dt, 0.0)
                 }
             }
+        }
+
+        val ballInstances = gameObjectList.filterIsInstance<Ball>()
+        if (ballInstances.size > 1) {
+            println(ballInstances[2])
+            println("----------")
         }
 
         doCollisionLogic()
@@ -257,9 +260,19 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
 
                     for (otherObject in gameObjectList) {
                         if (otherObject is Paddle) {
-                            if (gameObject.yPosition + gameObject.height > otherObject.yPosition || gameObject.yPosition < otherObject.yPosition + otherObject.height) {
-                                if(gameObject.xPosition + gameObject.width > otherObject.xPosition || gameObject.xPosition < otherObject.xPosition + otherObject.width) {
-                                    collisionListener.onCollision(CollisionEvent.BALL_PADDLE, gameObject, otherObject, 1.0)
+                            if (!(gameObject.xPosition <= otherObject.xPosition + otherObject.width && gameObject.xPosition + gameObject.width >= otherObject.xPosition)) continue
+                            when (otherObject.side) {
+                                1 -> {
+                                    if (gameObject.yPosition + gameObject.height >= otherObject.yPosition) {
+                                        val intersect = gameObject.yPosition + gameObject.height - otherObject.yPosition
+                                        collisionListener.onCollision(CollisionEvent.BALL_PADDLE, gameObject, otherObject, intersect)
+                                    }
+                                }
+                                2 -> {
+                                    if (gameObject.yPosition <= otherObject.yPosition + otherObject.height) {
+                                        val intersect = otherObject.yPosition + otherObject.height - gameObject.yPosition
+                                        collisionListener.onCollision(CollisionEvent.BALL_PADDLE, gameObject, otherObject, intersect)
+                                    }
                                 }
                             }
                         }
@@ -283,19 +296,13 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                 }
 
                 is Paddle -> {
-                    if (gameObject.xPosition <= 0 || gameObject.xPosition + gameObject.width >= this.width) {
-                        val wallIntersect = if (gameObject.xPosition <= 0) 0 - gameObject.xPosition
-                        else gameObject.xPosition + gameObject.width - this.width
+                    if (gameObject.xPosition <= 0) gameObject.xPosition = 0.0
+                    if (gameObject.xPosition + gameObject.width >= this.width) gameObject.xPosition = this.width - gameObject.width
 
-                        collisionListener.onCollision(event = CollisionEvent.PADDLE_WALL, obj1 = gameObject, intersect =  wallIntersect)
-                    }
-
-                    val iterator = powerUpList.iterator()
-                    while (iterator.hasNext()) {
-                        val powerUp = iterator.next()
-                        if (gameObject.xPosition in powerUp.xPosition..powerUp.xPosition + powerUp.width && gameObject.side == powerUp.side) {
+                    for (powerUp in powerUpList){
+                        if (((gameObject.xPosition in powerUp.xPosition..powerUp.xPosition + powerUp.width) || (gameObject.xPosition + gameObject.width in powerUp.xPosition..powerUp.xPosition + powerUp.width)) && gameObject.side == powerUp.side) {
                             collisionListener.onCollision(CollisionEvent.PADDLE_POWERUP, gameObject, powerUp, 0.0, gameObjectList)
-                            iterator.remove()
+                            powerUpList.remove(powerUp)
                         }
                     }
                 }
@@ -306,17 +313,14 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     fun initializeBall() {
         var i = 0
 
-        val iterator = gameObjectList.iterator()
-        while (iterator.hasNext()) {
-            val gameObject = iterator.next()
-
+        for (gameObject in gameObjectList) {
             if (gameObject is Ball) {
                 gameObject.xPosition = ((this.width/4)..(2 * this.width/3)).random().toDouble()
                 gameObject.yPosition = this.height / 2.0
 
                 if (isSplitGame && i % 2 == 0) gameObject.xPosition = this.width / 2 - this.width / 4.0
                 if (isSplitGame && i % 2 == 1) gameObject.xPosition = this.width / 2 + this.width / 4.0
-                if (gameObject.isTemporary) iterator.remove()
+                if (gameObject.isTemporary) gameObjectList.remove(gameObject)
 
                 gameObject.processed = false
                 gameObject.ballSpeed = (650..725).random().toDouble()
@@ -333,25 +337,25 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         for (paddle in gameObjectList.filterIsInstance<Paddle>()) {
             if (playerNum == 2) {
                 if (paddleNum == 0 || paddle.side == paddleNum) {
-                    paddle.paddleWidth = 150.0
+                    paddle.width = 150.0
                     paddle.paddleSpeed = 800.0
-                    paddle.xPosition = this.width / 2 - paddle.paddleWidth / 2
+                    paddle.xPosition = this.width / 2 - paddle.width / 2
                 }
-                if (paddle.side == 1 && !isSplitGame) paddle.xPosition = this.width / 2 - paddle.paddleWidth / 2
-                if (isSplitGame && i % 2 == 0) paddle.xPosition = this.width / 2 - this.width / 4 - paddle.paddleWidth / 2
-                if (isSplitGame && i++ % 2 == 1) paddle.xPosition = this.width / 2 + this.width / 4 - paddle.paddleWidth / 2
+                if (paddle.side == 1 && !isSplitGame) paddle.xPosition = this.width / 2 - paddle.width / 2
+                if (isSplitGame && i % 2 == 0) paddle.xPosition = this.width / 2 - this.width / 4 - paddle.width / 2
+                if (isSplitGame && i++ % 2 == 1) paddle.xPosition = this.width / 2 + this.width / 4 - paddle.width / 2
             } else if (playerNum == 1) {
                 if (paddle.side == 2) {
-                    paddle.xPosition = this.width / 2 - paddle.paddleWidth / 2
-                    paddle.paddleWidth = 2000.0
+                    paddle.xPosition = this.width / 2 - paddle.width / 2
+                    paddle.width = 2000.0
                     paddle.paddleSpeed = 0.0
                 } else if (paddle.side == 1) {
-                    paddle.xPosition = this.width / 2 - paddle.paddleWidth / 2
+                    paddle.xPosition = this.width / 2 - paddle.width / 2
 
-                    paddle.paddleWidth = 150.0
+                    paddle.width = 150.0
                     paddle.paddleSpeed = 800.0
-                    if (isSplitGame && i % 2 == 0) paddle.xPosition = this.width / 2 + this.width / 4 - paddle.paddleWidth / 2
-                    if (isSplitGame && i++ % 2 == 1) paddle.xPosition = this.width / 2 - this.width / 4 - paddle.paddleWidth / 2
+                    if (isSplitGame && i % 2 == 0) paddle.xPosition = this.width / 2 + this.width / 4 - paddle.width / 2
+                    if (isSplitGame && i++ % 2 == 1) paddle.xPosition = this.width / 2 - this.width / 4 - paddle.width / 2
                 }
             }
 
@@ -413,14 +417,13 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
         for (gameObject in gameObjectList) {
             if (gameObject is Ball) {
                 when {
-                    gameObject.yPosition + 2 * gameObject.ballRadius < 0 -> {
+                    gameObject.yPosition + gameObject.width < 0 -> {
                         if (!gameObject.processed) {
                             gameManager?.onGameEvent(GameEvent.ADD_SCORE_ONE)
                             refreshScore()
                             player1Gain++
                         }
-                        gameObject.processed = true
-
+                        gameObjectList.remove(gameObject)
                     }
 
                     gameObject.yPosition > this.height -> {
@@ -429,7 +432,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
                             refreshScore()
                             player2Gain++
                         }
-                        gameObject.processed = true
+                        gameObjectList.remove(gameObject)
                     }
                     else -> allBallsOffScreen = false
                 }
@@ -443,7 +446,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
     private fun checkForWin(): Int {
         if (playerNum == 1) {
             for (gameObject in gameObjectList) {
-                if (gameObject is Paddle && gameObject.side == 1 && gameObject.paddleWidth > this.width) {
+                if (gameObject is Paddle && gameObject.side == 1 && gameObject.width > this.width) {
                     return 3
                 }
             }
@@ -454,8 +457,8 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
             for (gameObject in gameObjectList) {
                 if (gameObject is Paddle) {
                     when (gameObject.side) {
-                        1 -> if (gameObject.paddleWidth > this.width / 2) player2Win = true
-                        2 -> if (gameObject.paddleWidth > this.width / 2) player1Win = true
+                        1 -> if (gameObject.width > this.width / 2) player2Win = true
+                        2 -> if (gameObject.width > this.width / 2) player1Win = true
                     }
                 }
             }
@@ -489,7 +492,7 @@ class GamePanel(private val gameObjectList: ArrayList<GameObject>, private val s
 
     fun setPlayers(playerNum: Int) { this.playerNum = playerNum }
     fun setGameListener(listener: GameListener) { this.gameManager = listener }
-    fun setPowerUpList(list: ArrayList<PowerUp>) { this.powerUpList = list }
+    fun setPowerUpList(list: CopyOnWriteArrayList<PowerUp>) { this.powerUpList = list }
     fun setSplitGame(sg: Boolean) { this.isSplitGame = sg }
     fun setColors(colors: Array<Color>) { this.colors = colors }
 }

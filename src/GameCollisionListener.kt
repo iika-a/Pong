@@ -1,3 +1,4 @@
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -5,7 +6,7 @@ import kotlin.math.sign
 import kotlin.random.Random
 
 class GameCollisionListener: CollisionListener {
-    override fun onCollision(event: CollisionEvent, obj1: GameObject, obj2: GameObject, intersect: Double, gameObjectList: ArrayList<GameObject>) {
+    override fun onCollision(event: CollisionEvent, obj1: GameObject, obj2: GameObject, intersect: Double, gameObjectList: CopyOnWriteArrayList<GameObject>) {
         when (event) {
             CollisionEvent.BALL_PADDLE -> {
                 obj1.yVelocity *= -1
@@ -42,9 +43,9 @@ class GameCollisionListener: CollisionListener {
         }
     }
 
-    override fun applyPowerUp(paddle: Paddle, powerUp: PowerUp, gameObjectList: ArrayList<GameObject>) {
+    override fun applyPowerUp(paddle: Paddle, powerUp: PowerUp, gameObjectList: CopyOnWriteArrayList<GameObject>) {
         when (powerUp.type) {
-            PowerUpType.INCREASE_PADDLE_SIZE -> paddle.paddleWidth += (15..25).random()
+            PowerUpType.INCREASE_PADDLE_SIZE -> paddle.move(0.0, 0.0, (15..25).random().toDouble(), 0.0)
             PowerUpType.INCREASE_PADDLE_SPEED -> paddle.paddleSpeed += 100
             PowerUpType.RANDOMIZE_BALL_ANGLE -> gameObjectList.filterIsInstance<Ball>().random().velocityAngle = getRandomAngle()
             PowerUpType.RANDOMIZE_BALL_SPEED -> gameObjectList.filterIsInstance<Ball>().random().ballSpeed = (475..625).random().toDouble()
@@ -66,12 +67,10 @@ class GameCollisionListener: CollisionListener {
     }
 
     fun checkIntersect(obj1: GameObject, obj2: GameObject): Boolean {
-        val result = obj1.xPosition < obj2.xPosition + obj2.width &&
+        return obj1.xPosition < obj2.xPosition + obj2.width &&
                 obj1.xPosition + obj1.width > obj2.xPosition &&
                 obj1.yPosition < obj2.yPosition + obj2.height &&
                 obj1.yPosition + obj1.height > obj2.yPosition
-        if (obj2.yPosition == 0.0) println("$result \n-------")
-        return result
     }
 
     private fun getRandomAngle(): Double {

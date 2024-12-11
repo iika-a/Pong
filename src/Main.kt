@@ -1,6 +1,6 @@
 import com.formdev.flatlaf.FlatLightLaf
 
-import java.util.ArrayList
+import java.util.concurrent.CopyOnWriteArrayList
 import java.awt.event.KeyEvent
 import javax.swing.OverlayLayout
 import javax.swing.SwingUtilities
@@ -10,10 +10,8 @@ import javax.swing.JFrame
 import javax.swing.JPanel
 
 fun main() {
-    val gameObjectList = ArrayList<GameObject>()
+    val gameObjectList = CopyOnWriteArrayList<GameObject>()
 
-    val ball = Ball()
-    gameObjectList.add(ball)
     val paddle1 = Paddle(side = 2, leftKey = KeyEvent.VK_A, rightKey = KeyEvent.VK_D)
     gameObjectList.add(paddle1)
     val paddle2 = Paddle(side = 1, leftKey = KeyEvent.VK_LEFT, rightKey = KeyEvent.VK_RIGHT)

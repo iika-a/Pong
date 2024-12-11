@@ -1,6 +1,7 @@
 import kotlin.random.Random
+import java.util.concurrent.CopyOnWriteArrayList
 
-class GameLoop(private val gamePanel: GamePanel, private val powerUpList: ArrayList<PowerUp>) : Runnable {
+class GameLoop(private val gamePanel: GamePanel, private val powerUpList: CopyOnWriteArrayList<PowerUp>) : Runnable {
 
     @Volatile
     private var isRunning = false
