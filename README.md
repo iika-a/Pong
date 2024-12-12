@@ -33,7 +33,7 @@ Goals I want to implement in the future. (NOT CONFIRMED)
 ![Game Screenshot](screenshots/Screenshot_3.png)
 
 ## License
-This project is open source and available for personal use. Feel free to share and modify it!
+This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.
 
 ## Contact
 Created by [**iika**](https://github.com/iika-a/)<br>
