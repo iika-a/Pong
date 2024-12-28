@@ -38,4 +38,4 @@ This project is open source and available for personal use. Feel free to share a
 ## Contact
 Created by [**iika**](https://github.com/iika-a/)<br>
 Discord: iika<br>
-Feel free to contact me!
+Please message request instead of adding!
