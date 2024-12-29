@@ -30,12 +30,12 @@ import kotlin.random.Random
 class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), KeyListener {
     private var player1Gain = 0
     private var player2Gain = 0
-    private val gameFont = Font("Segoe UI", 0, 14)
-    private val lossLabel = JLabel("You Lose!").apply { font = gameFont }
+    private val gameFont = Font("Segoe UI", 0, 20)
+    private val lossLabel = JLabel("You Lose!").apply { font = gameFont.deriveFont(26f) }
     private val multiLossLabel = JLabel("Player 1: +$player1Gain      Player 2: +$player2Gain").apply { font = gameFont }
-    private val winLabel = JLabel("You Win!").apply { font = gameFont }
-    private val winLabel1 = JLabel("<html>Player 1 Won. Continue for 1 point<br>⠀⠀⠀⠀⠀⠀⠀Or exit for 0.5?</html>").apply { font = gameFont.deriveFont(12f) }
-    private val winLabel2 = JLabel("<html>Player 2 Won. Continue for 1 point<br>⠀⠀⠀⠀⠀⠀⠀Or exit for 0.5?</html>").apply { font = gameFont.deriveFont(12f) }
+    private val winLabel = JLabel("You Win!").apply { font = gameFont.deriveFont(26f) }
+    private val winLabel1 = JLabel("<html>Player 1 Won. Continue for 1 point<br>⠀⠀⠀⠀⠀⠀⠀Or exit for 0.5?</html>").apply { font = gameFont.deriveFont(18f) }
+    private val winLabel2 = JLabel("<html>Player 2 Won. Continue for 1 point<br>⠀⠀⠀⠀⠀⠀⠀Or exit for 0.5?</html>").apply { font = gameFont.deriveFont(18f) }
     private val scoreLabel1 = JLabel("Player 1 Score: ${scoreKeeper.score1}").apply { font = gameFont }
     private val scoreLabel2 = JLabel("Player 2 Score: ${scoreKeeper.score2}").apply { font = gameFont }
     private val replayButton = JButton("Play Again").apply { setButtonSettings(this) }
@@ -67,9 +67,11 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         winLabel2.isVisible = false
 
         scoreLabel1.horizontalAlignment = JLabel.RIGHT
+        scoreLabel1.verticalAlignment = JLabel.BOTTOM
         scoreLabel1.isVisible = false
 
         scoreLabel2.horizontalAlignment = JLabel.LEFT
+        scoreLabel2.verticalAlignment = JLabel.TOP
         scoreLabel2.isVisible = false
 
         replayButton.addActionListener {gameManager?.onGameEvent(GameEvent.REPLAY_GAME)}
@@ -187,9 +189,9 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
 
         if (checkForLoss() != 0 || checkForWin() != 0) {
             g2d.color = Color.BLACK
-            g2d.fill(Rectangle2D.Double(this.width/2 - 200 - 2.0, this.height/2 - 70 - 2.0, 504.0, 209.0))
+            g2d.fill(Rectangle2D.Double(this.width/2 - 200 - 2.0, this.height/2 - 70 - 2.0, 404.0, 309.0))
             g2d.color = Color(0xFFD1DC)
-            g2d.fill(Rectangle2D.Double(this.width/2 - 200.0, this.height/2 - 70.0, 500.0, 205.0))
+            g2d.fill(Rectangle2D.Double(this.width/2 - 200.0, this.height/2 - 70.0, 400.0, 305.0))
         }
     }
 
@@ -244,6 +246,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
 
             3 -> {
                 gameManager?.onGameEnd()
+                winLabel.isVisible = true
                 replayButton.isVisible = true
                 exitButton.isVisible = true
             }
@@ -307,8 +310,8 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                     if (gameObject.xPosition <= 0) gameObject.xPosition = 0.0
                     if (gameObject.xPosition + gameObject.width >= this.width) gameObject.xPosition = this.width - gameObject.width
 
-                    for (powerUp in powerUpList){
-                        if (((gameObject.xPosition in powerUp.xPosition..powerUp.xPosition + powerUp.width) || (gameObject.xPosition + gameObject.width in powerUp.xPosition..powerUp.xPosition + powerUp.width)) && gameObject.side == powerUp.side) {
+                    for (powerUp in powerUpList) {
+                        if (((powerUp.xPosition in gameObject.xPosition..(gameObject.xPosition + gameObject.width)) || (powerUp.xPosition + powerUp.width in gameObject.xPosition..(gameObject.xPosition + gameObject.width))) && gameObject.side == powerUp.side) {
                             collisionListener.onCollision(CollisionEvent.PADDLE_POWERUP, gameObject, powerUp, 0.0, gameObjectList)
                             powerUpList.remove(powerUp)
                         }
@@ -371,16 +374,16 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     }
 
     fun initializeComponents() {
-        lossLabel.setBounds(this.width/2 - 100, this.height/2 - 30, 200, 50)
-        multiLossLabel.setBounds(this.width/2 - 100, this.height/2 - 30, 200, 50)
-        replayButton.setBounds(this.width/2 - 100, this.height/2 + 22, 200, 50)
-        continueButton.setBounds(this.width/2 - 100, this.height/2 + 22, 200, 50)
-        exitButton.setBounds(this.width/2 - 100, this.height/2 + 75, 200, 50)
-        winLabel.setBounds(this.width/2 - 100, this.height/2 - 30, 200, 50)
-        winLabel1.setBounds(this.width/2 - 100, this.height/2 - 55, 200, 100)
-        winLabel2.setBounds(this.width/2 - 100, this.height/2 - 55, 200, 100)
-        scoreLabel1.setBounds(this.width - 200, this.height - 50, 200, 50)
-        scoreLabel2.setBounds(0, 0, 200, 50)
+        lossLabel.setBounds(this.width/2 - 138, this.height/2 - 66, 276, 85)
+        multiLossLabel.setBounds(this.width/2 - 138, this.height/2 - 66, 276, 85)
+        replayButton.setBounds(this.width/2 - 138, this.height/2 + 22, 276, 85)
+        continueButton.setBounds(this.width/2 - 138, this.height/2 + 22, 276, 85)
+        exitButton.setBounds(this.width/2 - 138, this.height/2 + 110, 276, 85)
+        winLabel.setBounds(this.width/2 - 138, this.height/2 - 66, 276, 85)
+        winLabel1.setBounds(this.width/2 - 138, this.height/2 - 105, 276, 170)
+        winLabel2.setBounds(this.width/2 - 138, this.height/2 - 105, 276, 170)
+        scoreLabel1.setBounds(this.width - 275, this.height - 95, 276, 85)
+        scoreLabel2.setBounds(0, 15, 276, 85)
         player1Gain = 0
         player2Gain = 0
 
@@ -486,7 +489,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     }
 
     private fun setButtonSettings(button: JButton) {
-        val menuFont = Font("Segoe UI", 0, 18)
+        val menuFont = Font("Segoe UI", 0, 26)
         val buttonColor = Color(0xD1F6FF)
         val buttonBorder = LineBorder(Color.WHITE, 3)
 

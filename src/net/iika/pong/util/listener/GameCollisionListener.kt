@@ -54,7 +54,7 @@ class GameCollisionListener: CollisionListener {
 
     override fun applyPowerUp(paddle: Paddle, powerUp: PowerUp, gameObjectList: CopyOnWriteArrayList<GameObject>) {
         when (powerUp.type) {
-            PowerUpType.INCREASE_PADDLE_SIZE -> paddle.move(0.0, 0.0, (15..25).random().toDouble(), 0.0)
+            PowerUpType.INCREASE_PADDLE_SIZE -> paddle.move(0.0, 0.0, (515..525).random().toDouble(), 0.0)
             PowerUpType.INCREASE_PADDLE_SPEED -> paddle.paddleSpeed += 100
             PowerUpType.RANDOMIZE_BALL_ANGLE -> {
                 val ball = gameObjectList.filterIsInstance<Ball>().random()
@@ -75,9 +75,10 @@ class GameCollisionListener: CollisionListener {
                         xVel = xVelocity,
                         yVel = yVelocity,
                         isTemporary = true,
-                        initialDirection = direction++
+                        initialDirection = direction
                     )
                 )
+                direction = 1 - direction
             }
         }
     }
