@@ -38,4 +38,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) fi
 ## Contact
 Created by [**iika**](https://github.com/iika-a/)<br>
 Discord: iika<br>
-Feel free to contact me!
+Please message request instead of adding!
