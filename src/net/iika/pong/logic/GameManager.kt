@@ -1,9 +1,23 @@
+package net.iika.pong.logic
+
+import net.iika.pong.util.gameenum.GameMap
+import net.iika.pong.util.gameenum.GameMode
+import net.iika.pong.logic.gameobject.GameObject
+import net.iika.pong.util.gameenum.GameOption
+import net.iika.pong.logic.gameobject.Obstacle
+import net.iika.pong.logic.gameobject.Paddle
+import net.iika.pong.logic.gameobject.PowerUp
+import net.iika.pong.util.gameenum.PowerUpType
+import net.iika.pong.logic.gameobject.Ball
+import net.iika.pong.util.gameenum.GameEvent
+import net.iika.pong.util.listener.GameListener
 import java.awt.Color
 import java.awt.event.KeyEvent
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.swing.DefaultListModel
 
-class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: CopyOnWriteArrayList<GameObject>): GameListener {
+class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: CopyOnWriteArrayList<GameObject>):
+    GameListener {
     private var playerNum = 0
     private val powerUpList = CopyOnWriteArrayList<PowerUp>()
     private val colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
@@ -78,16 +92,28 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
                 GameOption.THREE_OBSTACLES -> setMap(GameMap.RANDOM_OBSTACLES, 3)
                 GameOption.FOUR_OBSTACLES -> setMap(GameMap.RANDOM_OBSTACLES, 4)
                 GameOption.ONE_BIG_BLOCK -> setMap(GameMap.ONE_BIG_BLOCK)
-                GameOption.DOUBLE_BALL -> gameObjectList.add(Ball())
+                GameOption.DOUBLE_BALL -> gameObjectList.add(Ball(initialDirection = 1))
                 GameOption.DOUBLE_PADDLE -> {
                     gameObjectList.add(Paddle(side = 1, leftKey = keybinds[0], rightKey = keybinds[1]))
-                    if (playerNum == 2) gameObjectList.add(Paddle(side = 2, leftKey = keybinds[2], rightKey = keybinds[3]))
+                    if (playerNum == 2) gameObjectList.add(
+                        Paddle(
+                            side = 2,
+                            leftKey = keybinds[2],
+                            rightKey = keybinds[3]
+                        )
+                    )
                 }
                 GameOption.SPLIT_GAME -> {
                     gamePanel.setSplitGame(true)
                     gameObjectList.add(Paddle(side = 1, leftKey = keybinds[0], rightKey = keybinds[1]))
-                    if (playerNum == 2) gameObjectList.add(Paddle(side = 2, leftKey = keybinds[2], rightKey = keybinds[3]))
-                    gameObjectList.add(Ball())
+                    if (playerNum == 2) gameObjectList.add(
+                        Paddle(
+                            side = 2,
+                            leftKey = keybinds[2],
+                            rightKey = keybinds[3]
+                        )
+                    )
+                    gameObjectList.add(Ball(initialDirection = 1))
                     gameObjectList.add(Obstacle(gamePanel.width / 2 - 5.0, 0.0, 10.0, gamePanel.height.toDouble()))
                 }
                 null -> throw NoWhenBranchMatchedException("Invalid Game Option")
@@ -129,7 +155,12 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
             GameMap.NO_OBSTACLES -> {}
 
             GameMap.RANDOM_OBSTACLES -> {
-                for (i in 1..obstacles) gameObjectList.add(Obstacle((20..gamePanel.width-200).random().toDouble(), (20..gamePanel.height-200).random().toDouble()))
+                for (i in 1..obstacles) gameObjectList.add(
+                    Obstacle(
+                        (20..gamePanel.width - 200).random().toDouble(),
+                        (20..gamePanel.height - 200).random().toDouble()
+                    )
+                )
             }
 
             GameMap.ONE_BIG_BLOCK -> {

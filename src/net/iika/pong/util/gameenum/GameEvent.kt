@@ -1,3 +1,5 @@
+package net.iika.pong.util.gameenum
+
 enum class GameEvent {
     REPLAY_GAME,
     EXIT_TO_MENU,

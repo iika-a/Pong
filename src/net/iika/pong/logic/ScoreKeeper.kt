@@ -1,3 +1,5 @@
+package net.iika.pong.logic
+
 data class ScoreKeeper (
     var score1: Double,
     var score2: Double

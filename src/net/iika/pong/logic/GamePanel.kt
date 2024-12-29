@@ -1,3 +1,16 @@
+package net.iika.pong.logic
+
+import net.iika.pong.logic.gameobject.Obstacle
+import net.iika.pong.logic.gameobject.Paddle
+import net.iika.pong.logic.gameobject.PowerUp
+import net.iika.pong.util.gameenum.PowerUpType
+import net.iika.pong.logic.gameobject.Ball
+import net.iika.pong.logic.gameobject.GameObject
+import net.iika.pong.util.gameenum.CollisionEvent
+import net.iika.pong.util.gameenum.GameEvent
+import net.iika.pong.util.listener.ButtonMouseListener
+import net.iika.pong.util.listener.GameCollisionListener
+import net.iika.pong.util.listener.GameListener
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
@@ -11,10 +24,7 @@ import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.LineBorder
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.min
+import kotlin.math.*
 import kotlin.random.Random
 
 class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), KeyListener {
@@ -198,12 +208,6 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
             }
         }
 
-        val ballInstances = gameObjectList.filterIsInstance<Ball>()
-        if (ballInstances.size > 1) {
-            println(ballInstances[2])
-            println("----------")
-        }
-
         doCollisionLogic()
 
         when (checkForLoss()) {
@@ -253,18 +257,20 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                 is Ball -> {
                     if (gameObject.xPosition <= 0 || gameObject.xPosition + gameObject.width >= this.width) {
                         val wallIntersect = if (gameObject.xPosition <= 0) 0 - gameObject.xPosition
-                        else gameObject.xPosition + gameObject.width - this.width
+                        else this.width - gameObject.xPosition - gameObject.width
 
-                        collisionListener.onCollision(event = CollisionEvent.BALL_WALL, obj1 = gameObject, intersect =  wallIntersect)
+                        gameObject.velocityAngle = atan2(gameObject.yVelocity, -1 * gameObject.xVelocity)
+                        collisionListener.onCollision(event = CollisionEvent.BALL_WALL, obj1 = gameObject, intersect = wallIntersect)
                     }
 
                     for (otherObject in gameObjectList) {
-                        if (otherObject is Paddle) {
-                            if (!(gameObject.xPosition <= otherObject.xPosition + otherObject.width && gameObject.xPosition + gameObject.width >= otherObject.xPosition)) continue
+                        if (otherObject is Paddle && collisionListener.checkIntersect(gameObject, otherObject)) {
+                            gameObject.velocityAngle = atan2(-1 * gameObject.yVelocity, gameObject.xVelocity)
+
                             when (otherObject.side) {
                                 1 -> {
                                     if (gameObject.yPosition + gameObject.height >= otherObject.yPosition) {
-                                        val intersect = gameObject.yPosition + gameObject.height - otherObject.yPosition
+                                        val intersect = otherObject.yPosition - gameObject.yPosition - gameObject.height
                                         collisionListener.onCollision(CollisionEvent.BALL_PADDLE, gameObject, otherObject, intersect)
                                     }
                                 }
@@ -280,6 +286,8 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                         if (gameObject != otherObject && collisionListener.checkIntersect(gameObject, otherObject) && otherObject !is Paddle) {
                             val xIntersect = min(gameObject.xPosition + gameObject.width - otherObject.xPosition, otherObject.xPosition + otherObject.width - gameObject.xPosition)
                             val yIntersect = min(gameObject.yPosition + gameObject.height - otherObject.yPosition, otherObject.yPosition + otherObject.height - gameObject.yPosition)
+                            if (xIntersect < yIntersect) gameObject.velocityAngle = atan2(gameObject.yVelocity, -1 * gameObject.xVelocity)
+                            if (xIntersect > yIntersect) gameObject.velocityAngle = atan2(-1 * gameObject.yVelocity, gameObject.xVelocity)
 
                             when (otherObject) {
                                 is Ball -> {
@@ -311,22 +319,20 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     }
 
     fun initializeBall() {
-        var i = 0
-
         for (gameObject in gameObjectList) {
             if (gameObject is Ball) {
                 gameObject.xPosition = ((this.width/4)..(2 * this.width/3)).random().toDouble()
                 gameObject.yPosition = this.height / 2.0
 
-                if (isSplitGame && i % 2 == 0) gameObject.xPosition = this.width / 2 - this.width / 4.0
-                if (isSplitGame && i % 2 == 1) gameObject.xPosition = this.width / 2 + this.width / 4.0
+                if (isSplitGame && gameObject.initialDirection == 0) gameObject.xPosition = this.width / 2 - this.width / 4.0
+                if (isSplitGame && gameObject.initialDirection == 1) gameObject.xPosition = this.width / 2 + this.width / 4.0
                 if (gameObject.isTemporary) gameObjectList.remove(gameObject)
 
                 gameObject.processed = false
                 gameObject.ballSpeed = (650..725).random().toDouble()
-                gameObject.velocityAngle = getRandomAngle()
+                gameObject.velocityAngle = getRandomAngle(gameObject.initialDirection)
                 gameObject.xVelocity = gameObject.ballSpeed * cos(gameObject.velocityAngle)
-                gameObject.yVelocity = gameObject.ballSpeed * sin(gameObject.velocityAngle) * (if (i++ % 2 == 1) -1 else 1)
+                gameObject.yVelocity = gameObject.ballSpeed * sin(gameObject.velocityAngle)
             }
         }
     }
@@ -399,15 +405,15 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         }
     }
 
-    private fun getRandomAngle(): Double {
-        return Random.nextDouble(PI /9, 7 * PI /18)
+    private fun getRandomAngle(direction: Int): Double {
+        return if (direction == 0) Random.nextDouble(PI/9, 7 * PI/18) else Random.nextDouble(PI/9 + PI, 7 * PI/18 + PI)
     }
 
     private fun speedUpBall(increment: Double = 0.0) {
         for (ball in gameObjectList.filterIsInstance<Ball>()) {
             ball.ballSpeed += increment
-            ball.xVelocity = ball.ballSpeed * cos(ball.velocityAngle) * (if (ball.xVelocity < 0) -1 else 1)
-            ball.yVelocity = ball.ballSpeed * sin(ball.velocityAngle) * (if (ball.yVelocity < 0) -1 else 1)
+            ball.xVelocity = ball.ballSpeed * cos(ball.velocityAngle)
+            ball.yVelocity = ball.ballSpeed * sin(ball.velocityAngle)
         }
     }
 

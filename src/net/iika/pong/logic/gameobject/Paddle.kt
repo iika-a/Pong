@@ -1,3 +1,5 @@
+package net.iika.pong.logic.gameobject
+
 data class Paddle (
     val xPos: Double = 0.0,
     var paddleWidth: Double = 150.0,

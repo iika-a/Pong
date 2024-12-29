@@ -1,3 +1,7 @@
+package net.iika.pong.logic
+
+import net.iika.pong.logic.gameobject.PowerUp
+import net.iika.pong.util.gameenum.PowerUpType
 import kotlin.random.Random
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -33,8 +37,19 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: CopyOn
 
     fun createPowerUp() {
         when (playerNum) {
-            1 -> powerUpList.add(PowerUp((0..gamePanel.width).random().toDouble(), 1, getRandomWithExclusions(everyPowerUp, excludeList)))
-            2 -> powerUpList.add(PowerUp(xPos = (0..gamePanel.width).random().toDouble(), type = getRandomWithExclusions(everyPowerUp, excludeList)))
+            1 -> powerUpList.add(
+                PowerUp(
+                    (0..gamePanel.width).random().toDouble(),
+                    1,
+                    getRandomWithExclusions(everyPowerUp, excludeList)
+                )
+            )
+            2 -> powerUpList.add(
+                PowerUp(
+                    xPos = (0..gamePanel.width).random().toDouble(),
+                    type = getRandomWithExclusions(everyPowerUp, excludeList)
+                )
+            )
         }
     }
 

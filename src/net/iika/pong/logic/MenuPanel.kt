@@ -1,3 +1,9 @@
+package net.iika.pong.logic
+
+import net.iika.pong.util.gameenum.PowerUpType
+import net.iika.pong.util.gameenum.GameOption
+import net.iika.pong.util.listener.ButtonMouseListener
+import net.iika.pong.util.listener.GameListener
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.BorderLayout
@@ -99,7 +105,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private val bigBlockButton = JButton("One Big Block").apply { setButtonSettings(this) }
     private val mapButtonList = arrayOf(noBlocksButton, randomBlocksButton, bigBlockButton)
 
-    private val oneBlockButton = JButton("One Obstacle").apply { setButtonSettings(this) }
+    private val oneBlockButton = JButton("One net.iika.pong.logic.gameobject.Obstacle").apply { setButtonSettings(this) }
     private val twoBlockButton = JButton("Two Obstacles").apply { setButtonSettings(this) }
     private val threeBlockButton = JButton("Three Obstacles").apply { setButtonSettings(this) }
     private val fourBlockButton = JButton("Four Obstacles").apply { setButtonSettings(this) }

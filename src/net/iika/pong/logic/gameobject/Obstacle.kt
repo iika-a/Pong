@@ -1,3 +1,5 @@
+package net.iika.pong.logic.gameobject
+
 data class Obstacle (
     val xPos: Double,
     val yPos: Double,

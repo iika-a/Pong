@@ -1,3 +1,5 @@
+package net.iika.pong.logic.gameobject
+
 data class Ball (
     val xPos: Double = 0.0,
     val yPos: Double = 0.0,
@@ -7,5 +9,6 @@ data class Ball (
     var velocityAngle: Double = 0.0,
     var ballSpeed: Double = 0.0,
     var processed: Boolean = false,
-    val isTemporary: Boolean = false
+    val isTemporary: Boolean = false,
+    val initialDirection: Int = 0
 ): GameObject(xPos, yPos, xVel, yVel, ballRadius * 2, ballRadius * 2)

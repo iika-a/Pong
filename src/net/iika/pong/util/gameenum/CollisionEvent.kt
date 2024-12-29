@@ -1,3 +1,5 @@
+package net.iika.pong.util.gameenum
+
 enum class CollisionEvent {
     BALL_PADDLE,
     BALL_WALL,

@@ -1,3 +1,5 @@
+package net.iika.pong.util.gameenum
+
 enum class GameOption(private val description: String) {
     NORMAL_MODE("Normal Mode"),
     CHAOS_MODE("Chaos Mode"),
@@ -8,7 +10,7 @@ enum class GameOption(private val description: String) {
     SINGLEPLAYER("Singleplayer"),
     MULTIPLAYER("Multiplayer"),
     NO_OBSTACLES("No Obstacles"),
-    ONE_OBSTACLE("One Obstacle"),
+    ONE_OBSTACLE("One net.iika.pong.logic.gameobject.Obstacle"),
     TWO_OBSTACLES("Two Obstacles"),
     THREE_OBSTACLES("Three Obstacles"),
     FOUR_OBSTACLES("Four Obstacles"),
