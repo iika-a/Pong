@@ -53,7 +53,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
     override fun onSetKeybind(key: Int, index: Int) {
         if (index > 3) keybinds[index - 4] = key
         else {
-            val paddle = gameObjectList[if (index < 2) 2 else 1] as Paddle
+            val paddle = gameObjectList[if (index < 2) 1 else 0] as Paddle
             when(index) {
                 0, 2 -> paddle.leftKey = key
                 1, 3 -> paddle.rightKey = key
@@ -113,7 +113,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
                             rightKey = keybinds[3]
                         )
                     )
-                    gameObjectList.add(Ball(initialDirection = 1))
                     gameObjectList.add(Obstacle(gamePanel.width / 2 - 5.0, 0.0, 10.0, gamePanel.height.toDouble()))
                 }
                 null -> throw NoWhenBranchMatchedException("Invalid Game Option")
@@ -136,7 +135,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
     }
 
     private fun doMenu() {
-        for (i in gameObjectList.lastIndex downTo 3) gameObjectList.removeAt(i)
+        for (i in gameObjectList.lastIndex downTo 2) gameObjectList.removeAt(i)
         gamePanel.setSplitGame(false)
         gamePanel.isVisible = false
         menuPanel.doMenu()

@@ -286,19 +286,21 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                             }
                         }
 
-                        if (gameObject != otherObject && collisionListener.checkIntersect(gameObject, otherObject) && otherObject !is Paddle) {
-                            val xIntersect = min(gameObject.xPosition + gameObject.width - otherObject.xPosition, otherObject.xPosition + otherObject.width - gameObject.xPosition)
-                            val yIntersect = min(gameObject.yPosition + gameObject.height - otherObject.yPosition, otherObject.yPosition + otherObject.height - gameObject.yPosition)
-                            if (xIntersect < yIntersect) gameObject.velocityAngle = atan2(gameObject.yVelocity, -1 * gameObject.xVelocity)
-                            if (xIntersect > yIntersect) gameObject.velocityAngle = atan2(-1 * gameObject.yVelocity, gameObject.xVelocity)
+                        if (otherObject == Obstacle(200.0, 200.0, this.width - 400.0, this.height - 400.0) && !collisionListener.checkIntersect(gameObject, otherObject)) gameObject.isImmune = false
+
+                        if (gameObject != otherObject && collisionListener.checkIntersect(gameObject, otherObject) && otherObject !is Paddle && !gameObject.isImmune) {
+                            val xIntersect = smallerAbsoluteValueWithSign(otherObject.xPosition - gameObject.xPosition - gameObject.width, otherObject.xPosition + otherObject.width - gameObject.xPosition)
+                            val yIntersect = smallerAbsoluteValueWithSign(otherObject.yPosition - gameObject.yPosition - gameObject.height, otherObject.yPosition + otherObject.height - gameObject.yPosition)
+                            if (abs(xIntersect) < abs(yIntersect)) gameObject.velocityAngle = atan2(gameObject.yVelocity, -1 * gameObject.xVelocity)
+                            if (abs(xIntersect) > abs(yIntersect)) gameObject.velocityAngle = atan2(-1 * gameObject.yVelocity, gameObject.xVelocity)
 
                             when (otherObject) {
                                 is Ball -> {
-                                    if (xIntersect < yIntersect) collisionListener.onCollision(CollisionEvent.BALL_BALL_SIDE, gameObject, otherObject, xIntersect)
+                                    if (abs(xIntersect) < abs(yIntersect)) collisionListener.onCollision(CollisionEvent.BALL_BALL_SIDE, gameObject, otherObject, xIntersect)
                                     else collisionListener.onCollision(CollisionEvent.BALL_BALL_TOP_BOTTOM, gameObject, otherObject, yIntersect)
                                 }
                                 is Obstacle -> {
-                                    if (xIntersect < yIntersect) collisionListener.onCollision(CollisionEvent.BALL_OBSTACLE_SIDE, gameObject, otherObject, xIntersect)
+                                    if (abs(xIntersect) < abs(yIntersect)) collisionListener.onCollision(CollisionEvent.BALL_OBSTACLE_SIDE, gameObject, otherObject, xIntersect)
                                     else collisionListener.onCollision(CollisionEvent.BALL_OBSTACLE_TOP_BOTTOM, gameObject, otherObject, yIntersect)
                                 }
                             }
@@ -322,10 +324,14 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     }
 
     fun initializeBall() {
+        if (isSplitGame) gameObjectList.add(Ball(initialDirection = 1))
+
         for (gameObject in gameObjectList) {
             if (gameObject is Ball) {
                 gameObject.xPosition = ((this.width/4)..(2 * this.width/3)).random().toDouble()
                 gameObject.yPosition = this.height / 2.0
+
+                if (!gameObjectList.filterIsInstance<Obstacle>().isEmpty() && gameObjectList.filterIsInstance<Obstacle>()[0] == Obstacle(200.0, 200.0, this.width - 400.0, this.height - 400.0)) gameObject.isImmune = true
 
                 if (isSplitGame && gameObject.initialDirection == 0) gameObject.xPosition = this.width / 2 - this.width / 4.0
                 if (isSplitGame && gameObject.initialDirection == 1) gameObject.xPosition = this.width / 2 + this.width / 4.0
@@ -498,6 +504,8 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         button.border = buttonBorder
         button.addMouseListener(buttonMouseListener)
     }
+
+    private fun smallerAbsoluteValueWithSign(a: Double, b: Double) = if (abs(a) < abs(b)) a else b
 
     fun setPlayers(playerNum: Int) { this.playerNum = playerNum }
     fun setGameListener(listener: GameListener) { this.gameManager = listener }

@@ -58,7 +58,7 @@ class GameCollisionListener: CollisionListener {
             PowerUpType.INCREASE_PADDLE_SPEED -> paddle.paddleSpeed += 100
             PowerUpType.RANDOMIZE_BALL_ANGLE -> {
                 val ball = gameObjectList.filterIsInstance<Ball>().random()
-                ball.velocityAngle = getRandomAngle(ball.initialDirection)
+                ball.velocityAngle = getRandomAngle(if (ball.velocityAngle in 0.0..PI/2) 0 else 1)
             }
             PowerUpType.RANDOMIZE_BALL_SPEED -> gameObjectList.filterIsInstance<Ball>().random().ballSpeed = (475..625).random().toDouble()
             PowerUpType.SPAWN_BALL -> {

@@ -105,7 +105,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private val bigBlockButton = JButton("One Big Block").apply { setButtonSettings(this) }
     private val mapButtonList = arrayOf(noBlocksButton, randomBlocksButton, bigBlockButton)
 
-    private val oneBlockButton = JButton("One net.iika.pong.logic.gameobject.Obstacle").apply { setButtonSettings(this) }
+    private val oneBlockButton = JButton("One Obstacle").apply { setButtonSettings(this) }
     private val twoBlockButton = JButton("Two Obstacles").apply { setButtonSettings(this) }
     private val threeBlockButton = JButton("Three Obstacles").apply { setButtonSettings(this) }
     private val fourBlockButton = JButton("Four Obstacles").apply { setButtonSettings(this) }
@@ -201,7 +201,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private fun createMainMenu(): JPanel {
         val panel = JPanel(GridBagLayout())
         val mainLabel = JLabel("iika's Pong").apply { font = menuFont }
-        val versionLabel = JLabel("version 1.2").apply { font = menuFont.deriveFont(18f) }
+        val versionLabel = JLabel("version 1.2.0").apply { font = menuFont.deriveFont(18f) }
         versionLabel.horizontalAlignment = JLabel.CENTER
         mainLabel.horizontalAlignment = JLabel.CENTER
 
