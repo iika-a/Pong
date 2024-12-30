@@ -11,12 +11,15 @@ import net.iika.pong.util.gameenum.GameEvent
 import net.iika.pong.util.listener.ButtonMouseListener
 import net.iika.pong.util.listener.GameCollisionListener
 import net.iika.pong.util.listener.GameListener
+import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
 import java.awt.Graphics2D
+import java.awt.RenderingHints
 import java.awt.geom.Rectangle2D
 import java.awt.geom.Ellipse2D
+import java.awt.geom.Path2D
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.util.concurrent.CopyOnWriteArrayList
@@ -24,13 +27,20 @@ import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.LineBorder
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.sin
+import kotlin.math.cos
+import kotlin.math.PI
 import kotlin.random.Random
 
 class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), KeyListener {
+    @Volatile
+    private var isRunning = false
     private var player1Gain = 0
     private var player2Gain = 0
     private val gameFont = Font("Segoe UI", 0, 20)
+    private val countLabel = JLabel("3...").apply { font = gameFont.deriveFont(26f) }
     private val lossLabel = JLabel("You Lose!").apply { font = gameFont.deriveFont(26f) }
     private val multiLossLabel = JLabel("Player 1: +$player1Gain      Player 2: +$player2Gain").apply { font = gameFont }
     private val winLabel = JLabel("You Win!").apply { font = gameFont.deriveFont(26f) }
@@ -46,6 +56,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     private var playerNum = 0
     private var powerUpList = CopyOnWriteArrayList<PowerUp>()
     private var isSplitGame = false
+    private var isDoubleBall = false
     private var colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
 
     init {
@@ -74,7 +85,11 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         scoreLabel2.verticalAlignment = JLabel.TOP
         scoreLabel2.isVisible = false
 
-        replayButton.addActionListener {gameManager?.onGameEvent(GameEvent.REPLAY_GAME)}
+        countLabel.horizontalAlignment = JLabel.CENTER
+        countLabel.verticalAlignment = JLabel.CENTER
+        countLabel.isVisible = true
+
+        replayButton.addActionListener { gameManager?.onGameEvent(GameEvent.REPLAY_GAME) }
         exitButton.addActionListener {
             when (checkForWin()) {
                 1 -> {
@@ -105,6 +120,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         this.add(replayButton)
         this.add(exitButton)
         this.add(continueButton)
+        this.add(countLabel)
         this.addKeyListener(this)
     }
 
@@ -128,6 +144,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
 
     override fun paintComponent(g: Graphics?) {
         val g2d = g as Graphics2D
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         super.paintComponent(g2d)
 
         for(powerUp in powerUpList) {
@@ -192,6 +209,15 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
             g2d.fill(Rectangle2D.Double(this.width/2 - 200 - 2.0, this.height/2 - 70 - 2.0, 404.0, 309.0))
             g2d.color = Color(0xFFD1DC)
             g2d.fill(Rectangle2D.Double(this.width/2 - 200.0, this.height/2 - 70.0, 400.0, 305.0))
+        }
+
+        if (!isRunning) {
+            g2d.color = Color.BLACK
+            g2d.fill(Rectangle2D.Double(this.width/2 - 27.0, this.height/2 - 27.0, 54.0, 54.0))
+            g2d.color = Color(0xFFD1DC)
+            g2d.fill(Rectangle2D.Double(this.width/2 - 25.0, this.height/2 - 25.0, 50.0, 50.0))
+
+            for (ball in gameObjectList.filterIsInstance<Ball>()) drawArrow(g2d, ball.xPosition + ball.width/2, ball.yPosition + ball.height/2, ball.velocityAngle)
         }
     }
 
@@ -324,14 +350,14 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     }
 
     fun initializeBall() {
-        if (isSplitGame) gameObjectList.add(Ball(initialDirection = 1))
+        if (isSplitGame || isDoubleBall) gameObjectList.add(Ball(initialDirection = 1))
 
         for (gameObject in gameObjectList) {
             if (gameObject is Ball) {
                 gameObject.xPosition = ((this.width/4)..(2 * this.width/3)).random().toDouble()
                 gameObject.yPosition = this.height / 2.0
 
-                if (!gameObjectList.filterIsInstance<Obstacle>().isEmpty() && gameObjectList.filterIsInstance<Obstacle>()[0] == Obstacle(200.0, 200.0, this.width - 400.0, this.height - 400.0)) gameObject.isImmune = true
+                if (gameObjectList.filterIsInstance<Obstacle>().isNotEmpty() && gameObjectList.filterIsInstance<Obstacle>()[0] == Obstacle(200.0, 200.0, this.width - 400.0, this.height - 400.0)) gameObject.isImmune = true
 
                 if (isSplitGame && gameObject.initialDirection == 0) gameObject.xPosition = this.width / 2 - this.width / 4.0
                 if (isSplitGame && gameObject.initialDirection == 1) gameObject.xPosition = this.width / 2 + this.width / 4.0
@@ -361,7 +387,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                 if (isSplitGame && i++ % 2 == 1) paddle.xPosition = this.width / 2 + this.width / 4 - paddle.width / 2
             } else if (playerNum == 1) {
                 if (paddle.side == 2) {
-                    paddle.xPosition = this.width / 2 - paddle.width / 2
+                    paddle.xPosition = 0.0
                     paddle.width = 2000.0
                     paddle.paddleSpeed = 0.0
                 } else if (paddle.side == 1) {
@@ -390,6 +416,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         winLabel2.setBounds(this.width/2 - 138, this.height/2 - 105, 276, 170)
         scoreLabel1.setBounds(this.width - 275, this.height - 95, 276, 85)
         scoreLabel2.setBounds(0, 15, 276, 85)
+        countLabel.setBounds(this.width/2 - 25, this.height/2 - 25, 50, 50)
         player1Gain = 0
         player2Gain = 0
 
@@ -401,6 +428,8 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         replayButton.isVisible = false
         exitButton.isVisible = false
         continueButton.isVisible = false
+        setRunning(false)
+        countLabel.text = "3..."
         when (playerNum) {
             1 -> {
                 scoreLabel1.isVisible = false
@@ -412,6 +441,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                 scoreLabel2.isVisible = true
             }
         }
+        repaint()
     }
 
     private fun getRandomAngle(direction: Int): Double {
@@ -505,11 +535,44 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         button.addMouseListener(buttonMouseListener)
     }
 
+    private fun drawArrow(g2d: Graphics2D, startX: Double, startY: Double, angle: Double) {
+        val headLength = 20.0
+        val offset = 20.0
+
+        val offsetX = startX + offset * cos(angle)
+        val offsetY = startY + offset * sin(angle)
+
+        val endX = offsetX + headLength * cos(angle)
+        val endY = offsetY + headLength * sin(angle)
+
+        val leftHeadX = endX - headLength * cos(angle - PI / 6)
+        val leftHeadY = endY - headLength * sin(angle - PI / 6)
+        val rightHeadX = endX - headLength * cos(angle + PI / 6)
+        val rightHeadY = endY - headLength * sin(angle + PI / 6)
+
+        val arrowhead = Path2D.Double().apply {
+            moveTo(endX, endY)
+            lineTo(leftHeadX, leftHeadY)
+            lineTo(rightHeadX, rightHeadY)
+            closePath()
+        }
+
+        g2d.color = Color(0xFFD1DC)
+        g2d.fill(arrowhead)
+
+        g2d.stroke = BasicStroke(2f)
+        g2d.color = Color.BLACK
+        g2d.draw(arrowhead)
+    }
+
     private fun smallerAbsoluteValueWithSign(a: Double, b: Double) = if (abs(a) < abs(b)) a else b
 
+    fun setRunning(isRunning: Boolean) { this.isRunning = isRunning; countLabel.isVisible = !isRunning }
     fun setPlayers(playerNum: Int) { this.playerNum = playerNum }
     fun setGameListener(listener: GameListener) { this.gameManager = listener }
     fun setPowerUpList(list: CopyOnWriteArrayList<PowerUp>) { this.powerUpList = list }
     fun setSplitGame(sg: Boolean) { this.isSplitGame = sg }
+    fun setDoubleBall(db: Boolean) { this.isDoubleBall = db }
     fun setColors(colors: Array<Color>) { this.colors = colors }
+    fun getCountLabel() = this.countLabel
 }

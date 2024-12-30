@@ -201,7 +201,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private fun createMainMenu(): JPanel {
         val panel = JPanel(GridBagLayout())
         val mainLabel = JLabel("iika's Pong").apply { font = menuFont }
-        val versionLabel = JLabel("version 1.2.1").apply { font = menuFont.deriveFont(18f) }
+        val versionLabel = JLabel("version 1.3.0").apply { font = menuFont.deriveFont(18f) }
         versionLabel.horizontalAlignment = JLabel.CENTER
         mainLabel.horizontalAlignment = JLabel.CENTER
 

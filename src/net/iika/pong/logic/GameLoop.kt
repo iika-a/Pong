@@ -72,9 +72,12 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: CopyOn
         while (isRunning) {
             val startTime = System.nanoTime()
 
-            gamePanel.advanceGame(1.0 / targetFPS)
+            if (++count >= 720) gamePanel.advanceGame(1.0 / targetFPS)
+            if (count == 240) gamePanel.getCountLabel().text = "2.."
+            if (count == 480) gamePanel.getCountLabel().text = "1."
+            if (count == 720) gamePanel.setRunning(true)
 
-            if (++count % powerUpCount == 0) createPowerUp()
+            if (count % powerUpCount == 0) createPowerUp()
 
             val elapsedTime = System.nanoTime() - startTime
 

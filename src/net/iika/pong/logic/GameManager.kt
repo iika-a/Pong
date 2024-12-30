@@ -92,7 +92,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
                 GameOption.THREE_OBSTACLES -> setMap(GameMap.RANDOM_OBSTACLES, 3)
                 GameOption.FOUR_OBSTACLES -> setMap(GameMap.RANDOM_OBSTACLES, 4)
                 GameOption.ONE_BIG_BLOCK -> setMap(GameMap.ONE_BIG_BLOCK)
-                GameOption.DOUBLE_BALL -> gameObjectList.add(Ball(initialDirection = 1))
+                GameOption.DOUBLE_BALL -> gamePanel.setDoubleBall(true)
                 GameOption.DOUBLE_PADDLE -> {
                     gameObjectList.add(Paddle(side = 1, leftKey = keybinds[0], rightKey = keybinds[1]))
                     if (playerNum == 2) gameObjectList.add(
@@ -137,6 +137,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
     private fun doMenu() {
         for (i in gameObjectList.lastIndex downTo 2) gameObjectList.removeAt(i)
         gamePanel.setSplitGame(false)
+        gamePanel.setDoubleBall(false)
         gamePanel.isVisible = false
         menuPanel.doMenu()
     }
