@@ -46,6 +46,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     private var playerNum = 0
     private var powerUpList = CopyOnWriteArrayList<PowerUp>()
     private var isSplitGame = false
+    private var isDoubleBall = false
     private var colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
 
     init {
@@ -324,7 +325,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     }
 
     fun initializeBall() {
-        if (isSplitGame) gameObjectList.add(Ball(initialDirection = 1))
+        if (isSplitGame || isDoubleBall) gameObjectList.add(Ball(initialDirection = 1))
 
         for (gameObject in gameObjectList) {
             if (gameObject is Ball) {
@@ -511,5 +512,6 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     fun setGameListener(listener: GameListener) { this.gameManager = listener }
     fun setPowerUpList(list: CopyOnWriteArrayList<PowerUp>) { this.powerUpList = list }
     fun setSplitGame(sg: Boolean) { this.isSplitGame = sg }
+    fun setDoubleBall(db: Boolean) { this.isDoubleBall = db }
     fun setColors(colors: Array<Color>) { this.colors = colors }
 }
