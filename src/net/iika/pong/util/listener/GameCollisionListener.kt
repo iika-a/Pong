@@ -83,14 +83,16 @@ class GameCollisionListener: CollisionListener {
         }
     }
 
-    fun checkIntersect(obj1: GameObject, obj2: GameObject): Boolean {
-        return obj1.xPosition < obj2.xPosition + obj2.width &&
-                obj1.xPosition + obj1.width > obj2.xPosition &&
-                obj1.yPosition < obj2.yPosition + obj2.height &&
-                obj1.yPosition + obj1.height > obj2.yPosition
-    }
-
     private fun getRandomAngle(direction: Int): Double {
         return if (direction == 0) Random.nextDouble(PI/9, 7 * PI/18) else Random.nextDouble(PI/9 + PI, 7 * PI/18 + PI)
+    }
+
+    companion object {
+        fun checkIntersect(obj1: GameObject, obj2: GameObject): Boolean {
+            return obj1.xPosition < obj2.xPosition + obj2.width &&
+                    obj1.xPosition + obj1.width > obj2.xPosition &&
+                    obj1.yPosition < obj2.yPosition + obj2.height &&
+                    obj1.yPosition + obj1.height > obj2.yPosition
+        }
     }
 }

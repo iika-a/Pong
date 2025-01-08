@@ -248,6 +248,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
             }
 
             2 -> {
+                refreshGains()
                 gameManager?.onGameEnd()
                 lossLabel.isVisible = true
                 replayButton.isVisible = true
@@ -293,7 +294,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                     }
 
                     for (otherObject in gameObjectList) {
-                        if (otherObject is Paddle && collisionListener.checkIntersect(gameObject, otherObject)) {
+                        if (otherObject is Paddle && GameCollisionListener.checkIntersect(gameObject, otherObject)) {
                             gameObject.velocityAngle = atan2(-1 * gameObject.yVelocity, gameObject.xVelocity)
 
                             when (otherObject.side) {
@@ -312,9 +313,9 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                             }
                         }
 
-                        if (otherObject == Obstacle(200.0, 200.0, this.width - 400.0, this.height - 400.0) && !collisionListener.checkIntersect(gameObject, otherObject)) gameObject.isImmune = false
+                        if (otherObject == Obstacle(200.0, 200.0, this.width - 400.0, this.height - 400.0) && !GameCollisionListener.checkIntersect(gameObject, otherObject)) gameObject.isImmune = false
 
-                        if (gameObject != otherObject && collisionListener.checkIntersect(gameObject, otherObject) && otherObject !is Paddle && !gameObject.isImmune) {
+                        if (gameObject != otherObject && GameCollisionListener.checkIntersect(gameObject, otherObject) && otherObject !is Paddle && !gameObject.isImmune) {
                             val xIntersect = smallerAbsoluteValueWithSign(otherObject.xPosition - gameObject.xPosition - gameObject.width, otherObject.xPosition + otherObject.width - gameObject.xPosition)
                             val yIntersect = smallerAbsoluteValueWithSign(otherObject.yPosition - gameObject.yPosition - gameObject.height, otherObject.yPosition + otherObject.height - gameObject.yPosition)
                             if (abs(xIntersect) < abs(yIntersect)) gameObject.velocityAngle = atan2(gameObject.yVelocity, -1 * gameObject.xVelocity)
