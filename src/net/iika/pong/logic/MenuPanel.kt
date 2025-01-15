@@ -209,7 +209,8 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
     private fun createUpdatePanel(): JPanel {
         val panel = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC) }
-        val updateLabel = JLabel("A new game version has released. Please download it on the releases page.").apply { font = menuFont }
+        val bigUpdateLabel = JLabel("Update Available!").apply { font = menuFont.deriveFont(45f); horizontalAlignment = JLabel.CENTER }
+        val updateLabel = JLabel("A newer game version is available.").apply { font = menuFont; horizontalAlignment = JLabel.CENTER }
         val constraints = GridBagConstraints().apply {
             gridx = 0
             gridy = GridBagConstraints.RELATIVE
@@ -217,6 +218,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
             fill = GridBagConstraints.HORIZONTAL
         }
 
+        panel.add(bigUpdateLabel, constraints)
         panel.add(updateLabel, constraints)
         panel.add(JPanel(FlowLayout()).apply { add(exitButton); add(updateButton) ; background = Color(0xFFD1DC) }, constraints)
 

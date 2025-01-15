@@ -5,10 +5,15 @@ A semi-modern Pong game written in Kotlin.
 This game is a side project that I also uploaded as Project #1 for my APCS Portfolio.
 This is also my first time writing Kotlin programs as well as developing a game in general.
 
-## Usage
-1. [Download](https://github.com/iika-a/Pong/releases) the `.jar` file
-2. Download and install [Java](https://adoptium.net/download/) (Minimum Version 8)
-3. Double-click the file OR run `java -jar path\to\Pong.jar` in a command line.
+## Installation & Usage
+### Windows
+1. [Download](https://github.com/iika-a/Pong/releases) the `.msi` file from the releases page.
+2. Run the installer.
+3. Run the executable file that was installed (usually in `%ProgramFiles%\Pong`)
+### macOS
+1. [Download](https://github.com/iika-a/Pong/releases) the `.dmg` file from the releases page.
+### Linux
+1. [Download](https://github.com/iika-a/Pong/releases) the `.tar.gz` file from the releases page.
 
 ## Features
 I tried to include every feature that I could think of to keep the game replayable and make it not that boring.
@@ -28,9 +33,9 @@ Goals I want to implement in the future. (NOT CONFIRMED)
 - Online multiplayer (I need to learn networking)
 
 ## Screenshots
-![Game Screenshot](screenshots/Screenshot_1.png)
-![Game Screenshot](screenshots/Screenshot_2.png)
-![Game Screenshot](screenshots/Screenshot_3.png)
+![Game Screenshot](resources/Screenshot_1.png)
+![Game Screenshot](resources/Screenshot_2.png)
+![Game Screenshot](resources/Screenshot_3.png)
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.
