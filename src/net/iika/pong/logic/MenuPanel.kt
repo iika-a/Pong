@@ -14,6 +14,7 @@ import java.awt.FlowLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
+import java.awt.Desktop
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyEvent
@@ -28,10 +29,15 @@ import javax.swing.JButton
 import javax.swing.JList
 import javax.swing.JColorChooser
 import javax.swing.JCheckBox
+import javax.swing.SwingUtilities
 import javax.swing.border.LineBorder
 import kotlin.system.exitProcess
+import java.lang.Exception
+import java.net.URI
+
 
 class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), ActionListener, KeyListener, ItemListener {
+    private val currentVersion = "v1.2.3"
     private val gameSetupPanel = JPanel(BorderLayout())
     private val settingsPanel = JPanel(BorderLayout())
     private val cards = CardLayout()
@@ -42,6 +48,8 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private var isChangingKeybind = false
     private var formerButtonText = ""
 
+    private val exitButton = JButton("Exit").apply { setButtonSettings(this) }
+    private val updateButton = JButton("Open GitHub").apply { setButtonSettings(this) }
     private val backButton = JButton("Back").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(80, 45) }
     private val resetButton = JButton("Reset Scores").apply { setButtonSettings(this); font = font.deriveFont(24f); preferredSize = Dimension(180, 45) }
     private val scoreLabel = JLabel("Player 1 Score: ${scoreKeeper.score1}              Player 2 Score: ${scoreKeeper.score2}").apply { font = menuFont.deriveFont(20f) }
@@ -147,6 +155,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
         this.add(gameSetupPanel, "Game Setup")
         this.add(settingsPanel, "Settings")
+        this.add(createUpdatePanel(), "Update")
     }
 
     private fun createTopPanel(): JPanel {
@@ -198,10 +207,26 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         scoreLabel.isVisible = false
     }
 
+    private fun createUpdatePanel(): JPanel {
+        val panel = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC) }
+        val updateLabel = JLabel("A new game version has released. Please download it on the releases page.").apply { font = menuFont }
+        val constraints = GridBagConstraints().apply {
+            gridx = 0
+            gridy = GridBagConstraints.RELATIVE
+            insets.set(10, 10, 10, 10)
+            fill = GridBagConstraints.HORIZONTAL
+        }
+
+        panel.add(updateLabel, constraints)
+        panel.add(JPanel(FlowLayout()).apply { add(exitButton); add(updateButton) ; background = Color(0xFFD1DC) }, constraints)
+
+        return panel
+    }
+
     private fun createMainMenu(): JPanel {
         val panel = JPanel(GridBagLayout())
         val mainLabel = JLabel("iika's Pong").apply { font = menuFont }
-        val versionLabel = JLabel("version 1.2.3").apply { font = menuFont.deriveFont(18f) }
+        val versionLabel = JLabel("version ${currentVersion.substring(1)}").apply { font = menuFont.deriveFont(18f) }
         versionLabel.horizontalAlignment = JLabel.CENTER
         mainLabel.horizontalAlignment = JLabel.CENTER
 
@@ -470,8 +495,17 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     override fun actionPerformed(e: ActionEvent?) {
         when (e?.source) {
             playButton -> {
-                showMenu("Players", gameButtonsPanel)
-                makeCommonComponentsVisible()
+                playButton.text = "Checking for Updates..."
+                playButton.font = menuFont.deriveFont(24f)
+                SwingUtilities.invokeLater {
+                    if (UpdateChecker.isUpdateNeeded(currentVersion)) {
+                        showMenu("Update", this)
+                    }
+                    showMenu("Players", gameButtonsPanel)
+                    playButton.text = "Play Pong"
+                    playButton.font = menuFont.deriveFont(26f)
+                    makeCommonComponentsVisible()
+                }
             }
             settingsButton -> {
                 showMenu("Settings", this)
@@ -479,8 +513,15 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
                 disableButtons(settingsKeybindsButton)
                 enableButtons(settingsColorsButton)
             }
-            quitButton -> {
+            quitButton, exitButton -> {
                 exitProcess(0)
+            }
+            updateButton -> {
+                try {
+                    Desktop.getDesktop().browse(URI("https://github.com/iika-a/pong/releases/latest"))
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                }
             }
 
             normalModeButton -> {
