@@ -3,6 +3,7 @@ package net.iika.pong.util.gameenum
 enum class GameEvent {
     REPLAY_GAME,
     EXIT_TO_MENU,
+    STARTUP,
     CREATE_POWER_UP,
     ADD_SCORE_ONE,
     ADD_SCORE_ONE_HALF,

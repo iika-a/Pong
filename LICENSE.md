@@ -1,7 +1,7 @@
 The MIT License (MIT)
 =====================
 
-Copyright © 2024 iika
+Copyright © 2024-2025 iika
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

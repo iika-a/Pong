@@ -32,6 +32,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         when (e) {
             GameEvent.REPLAY_GAME -> startGame()
             GameEvent.EXIT_TO_MENU -> doMenu()
+            GameEvent.STARTUP -> startUp()
             GameEvent.CREATE_POWER_UP -> gameLoop.createPowerUp()
             GameEvent.ADD_SCORE_ONE -> scoreKeeper.score1 += 1
             GameEvent.ADD_SCORE_ONE_HALF -> scoreKeeper.score1 += 0.5
@@ -140,6 +141,10 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         gamePanel.setDoubleBall(false)
         gamePanel.isVisible = false
         menuPanel.doMenu()
+    }
+
+    private fun startUp() {
+        menuPanel.startUp()
     }
 
     private fun setGameMode(gameMode: GameMode) {

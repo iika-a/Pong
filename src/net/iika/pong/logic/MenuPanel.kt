@@ -481,7 +481,17 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         doDefaultButtonStates()
         doDefaultBoxStates()
         showMenu("Game Setup", gameButtonsPanel)
-        showMenu("Main Menu", gameButtonsPanel)
+        showMenu("Players", gameButtonsPanel)
+    }
+
+    fun startUp() {
+        this.isVisible = true
+        resetGameOptionList()
+        refreshScore()
+        doDefaultButtonStates()
+        doDefaultBoxStates()
+        showMenu("Game Setup", gameButtonsPanel)
+        showMenu("Main menu", gameButtonsPanel)
     }
 
     private fun refreshScore() {

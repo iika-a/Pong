@@ -7,13 +7,16 @@ This is also my first time writing Kotlin programs as well as developing a game 
 
 ## Installation & Usage
 ### Windows
-1. [Download](https://github.com/iika-a/Pong/releases) the `.msi` file from the releases page.
-2. Run the installer.
-3. Run the executable file that was installed (usually in `%ProgramFiles%\Pong`)
+1. [Download](https://github.com/iika-a/Pong/releases) the `.zip` file from the releases page.
+2. Unzip the file into a folder (DO NOT SEPARATE THE `.exe` FILE AND THE `pongjre` FOLDER).
+3. Run the `.exe` file.
 ### macOS
 1. [Download](https://github.com/iika-a/Pong/releases) the `.dmg` file from the releases page.
+2. Run the `.dmg` file and move the app into the `Applications`.
+3. Eject the mounted drive.
+4. Run the app inside the `Applications` folder.
 ### Linux
-1. [Download](https://github.com/iika-a/Pong/releases) the `.tar.gz` file from the releases page.
+1. lolol idk i havent done this yet
 
 ## Features
 I tried to include every feature that I could think of to keep the game replayable and make it not that boring.
