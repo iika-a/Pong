@@ -16,7 +16,7 @@ This is also my first time writing Kotlin programs as well as developing a game 
 3. Eject the mounted drive.
 4. Run the app inside the `Applications` folder.
 ### Linux
-1. lolol idk i havent done this yet
+Coming Soon!
 
 ## Features
 I tried to include every feature that I could think of to keep the game replayable and make it not that boring.
