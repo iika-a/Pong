@@ -29,7 +29,6 @@ import javax.swing.JButton
 import javax.swing.JList
 import javax.swing.JColorChooser
 import javax.swing.JCheckBox
-import javax.swing.SwingUtilities
 import javax.swing.border.LineBorder
 import kotlin.system.exitProcess
 import java.lang.Exception
@@ -37,6 +36,7 @@ import java.net.URI
 
 
 class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), ActionListener, KeyListener, ItemListener {
+    private var isUpToDate = false
     private val currentVersion = "v1.2.3"
     private val gameSetupPanel = JPanel(BorderLayout())
     private val settingsPanel = JPanel(BorderLayout())
@@ -137,6 +137,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     init {
         this.layout = cards
         this.addKeyListener(this)
+        isUpToDate = !UpdateChecker.isUpdateNeeded(currentVersion)
 
         gameButtonsPanel.add(createMainMenu().apply { background = Color(0xFFD1DC) }, "Main Menu")
         gameButtonsPanel.add(createPlayersMenu().apply { background = Color(0xFFD1DC) }, "Players")
@@ -481,17 +482,8 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         doDefaultButtonStates()
         doDefaultBoxStates()
         showMenu("Game Setup", gameButtonsPanel)
-        showMenu("Players", gameButtonsPanel)
-    }
-
-    fun startUp() {
-        this.isVisible = true
-        resetGameOptionList()
-        refreshScore()
-        doDefaultButtonStates()
-        doDefaultBoxStates()
-        showMenu("Game Setup", gameButtonsPanel)
-        showMenu("Main menu", gameButtonsPanel)
+        showMenu("Main Menu", gameButtonsPanel)
+        if (!isUpToDate) showMenu("Update", this)
     }
 
     private fun refreshScore() {
@@ -507,17 +499,9 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     override fun actionPerformed(e: ActionEvent?) {
         when (e?.source) {
             playButton -> {
-                playButton.text = "Checking for Updates..."
-                playButton.font = menuFont.deriveFont(24f)
-                SwingUtilities.invokeLater {
-                    if (UpdateChecker.isUpdateNeeded(currentVersion)) {
-                        showMenu("Update", this)
-                    }
-                    showMenu("Players", gameButtonsPanel)
-                    playButton.text = "Play Pong"
-                    playButton.font = menuFont.deriveFont(26f)
-                    makeCommonComponentsVisible()
-                }
+                showMenu("Players", gameButtonsPanel)
+                playButton.font = menuFont.deriveFont(26f)
+                makeCommonComponentsVisible()
             }
             settingsButton -> {
                 showMenu("Settings", this)

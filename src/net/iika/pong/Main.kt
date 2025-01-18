@@ -67,6 +67,6 @@ fun main() {
         gamePanel.setGameListener(gameManager)
         menuPanel.setGameListener(gameManager)
 
-        gameManager.onGameEvent(GameEvent.STARTUP)
+        gameManager.onGameEvent(GameEvent.EXIT_TO_MENU)
     }
 }
