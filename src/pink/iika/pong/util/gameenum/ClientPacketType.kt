@@ -6,5 +6,6 @@ enum class ClientPacketType {
     PADDLE_RIGHT_DOWN,
     PADDLE_RIGHT_UP,
     JOIN_LOBBY,
-    EXIT_LOBBY
+    EXIT_LOBBY,
+    CLIENT_START_GAME
 }
