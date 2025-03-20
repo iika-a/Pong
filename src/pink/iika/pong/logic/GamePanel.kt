@@ -48,9 +48,11 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     private val winLabel2 = JLabel("<html>Player 2 Won. Continue for 1 point<br>⠀⠀⠀⠀⠀⠀⠀Or exit for 0.5?</html>").apply { font = gameFont.deriveFont(18f) }
     private val scoreLabel1 = JLabel("Player 1 Score: ${scoreKeeper.score1}").apply { font = gameFont }
     private val scoreLabel2 = JLabel("Player 2 Score: ${scoreKeeper.score2}").apply { font = gameFont }
+    private val pauseLabel = JLabel("Game is paused.").apply { font = gameFont.deriveFont(26f) }
     private val replayButton = JButton("Play Again").apply { setButtonSettings(this) }
     private val exitButton = JButton("Return to Menu").apply { setButtonSettings(this) }
     private val continueButton = JButton("Continue Game").apply { setButtonSettings(this) }
+    private val resumeButton = JButton("Resume Game").apply { setButtonSettings(this) }
     private var gameManager: GameListener? = null
     private var collisionListener: GameCollisionListener = GameCollisionListener()
     private var playerNum = 0
@@ -58,6 +60,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     private var isSplitGame = false
     private var isDoubleBall = false
     private var colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
+    private var isPaused = false
 
     init {
         this.background = Color.WHITE
@@ -89,6 +92,9 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         countLabel.verticalAlignment = JLabel.CENTER
         countLabel.isVisible = true
 
+        pauseLabel.horizontalAlignment = JLabel.CENTER
+        pauseLabel.verticalAlignment = JLabel.CENTER
+
         replayButton.addActionListener { gameManager?.onGameEvent(GameEvent.REPLAY_GAME) }
         exitButton.addActionListener {
             when (checkForWin()) {
@@ -108,7 +114,12 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
             when(checkForWin()) {
                 1 -> gameManager?.onGameEvent(GameEvent.CONTINUE_GAME_ONE)
                 2 -> gameManager?.onGameEvent(GameEvent.CONTINUE_GAME_TWO)
-            } }
+            }
+        }
+        resumeButton.addActionListener {
+            resume()
+            repaint()
+        }
 
         this.add(lossLabel)
         this.add(multiLossLabel)
@@ -121,6 +132,8 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         this.add(exitButton)
         this.add(continueButton)
         this.add(countLabel)
+        this.add(resumeButton)
+        this.add(pauseLabel)
         this.addKeyListener(this)
     }
 
@@ -128,6 +141,9 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         for (paddle in gameObjectList.filterIsInstance<Paddle>()) {
             if (e?.keyCode == paddle.leftKey) paddle.leftPress = true
             if (e?.keyCode == paddle.rightKey) paddle.rightPress = true
+        }
+        if (e?.keyCode == KeyEvent.VK_ESCAPE) {
+            pause()
         }
     }
 
@@ -147,7 +163,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         super.paintComponent(g2d)
 
-        for(powerUp in powerUpList) {
+        for (powerUp in powerUpList) {
             g2d.color = Color.BLACK
             when (powerUp.side) {
                 1 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition - 2, this.height - 10 - 2.0, 54.0, 12.0))
@@ -204,14 +220,14 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
             }
         }
 
-        if (checkForLoss() != 0 || checkForWin() != 0) {
+        if (checkForLoss() != 0 || checkForWin() != 0 || (isPaused && !isRunning)) {
             g2d.color = Color.BLACK
             g2d.fill(Rectangle2D.Double(this.width/2 - 200 - 2.0, this.height/2 - 70 - 2.0, 404.0, 309.0))
             g2d.color = Color(0xFFD1DC)
             g2d.fill(Rectangle2D.Double(this.width/2 - 200.0, this.height/2 - 70.0, 400.0, 305.0))
         }
 
-        if (!isRunning) {
+        if (!isRunning && !isPaused) {
             g2d.color = Color.BLACK
             g2d.fill(Rectangle2D.Double(this.width/2 - 27.0, this.height/2 - 27.0, 54.0, 54.0))
             g2d.color = Color(0xFFD1DC)
@@ -408,8 +424,10 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
 
     fun initializeComponents() {
         lossLabel.setBounds(this.width/2 - 138, this.height/2 - 66, 276, 85)
+        pauseLabel.setBounds(this.width/2 - 138, this.height/2 - 66, 276, 85)
         multiLossLabel.setBounds(this.width/2 - 138, this.height/2 - 66, 276, 85)
         replayButton.setBounds(this.width/2 - 138, this.height/2 + 22, 276, 85)
+        resumeButton.setBounds(this.width/2 - 138, this.height/2 + 22, 276, 85)
         continueButton.setBounds(this.width/2 - 138, this.height/2 + 22, 276, 85)
         exitButton.setBounds(this.width/2 - 138, this.height/2 + 110, 276, 85)
         winLabel.setBounds(this.width/2 - 138, this.height/2 - 66, 276, 85)
@@ -421,12 +439,14 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         player1Gain = 0
         player2Gain = 0
 
+        pauseLabel.isVisible = false
         winLabel.isVisible = false
         winLabel1.isVisible = false
         winLabel2.isVisible = false
         lossLabel.isVisible = false
         multiLossLabel.isVisible = false
         replayButton.isVisible = false
+        resumeButton.isVisible = false
         exitButton.isVisible = false
         continueButton.isVisible = false
         setRunning(false)
@@ -566,6 +586,26 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         g2d.draw(arrowhead)
     }
 
+    private fun pause() {
+        if (isRunning) {
+            resumeButton.isVisible = true
+            exitButton.isVisible = true
+            pauseLabel.isVisible = true
+            isPaused = true
+            isRunning = false
+            gameManager?.onGameEvent(GameEvent.PAUSE_GAME)
+        }
+    }
+
+    private fun resume() {
+        isPaused = false
+        pauseLabel.isVisible = false
+        exitButton.isVisible = false
+        resumeButton.isVisible = false
+        countLabel.isVisible = true
+        gameManager?.onGameEvent(GameEvent.RESUME_GAME)
+    }
+
     private fun smallerAbsoluteValueWithSign(a: Double, b: Double) = if (abs(a) < abs(b)) a else b
 
     fun setRunning(isRunning: Boolean) { this.isRunning = isRunning; countLabel.isVisible = !isRunning }
@@ -576,4 +616,5 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     fun setDoubleBall(db: Boolean) { this.isDoubleBall = db }
     fun setColors(colors: Array<Color>) { this.colors = colors }
     fun getCountLabel() = this.countLabel
+    fun setPaused(p: Boolean) { isPaused = p }
 }

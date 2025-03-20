@@ -10,4 +10,6 @@ enum class GameEvent {
     ADD_SCORE_TWO_HALF,
     CONTINUE_GAME_ONE,
     CONTINUE_GAME_TWO,
+    PAUSE_GAME,
+    RESUME_GAME
 }

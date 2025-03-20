@@ -22,17 +22,41 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: CopyOn
     )
     private val excludeList = java.util.ArrayList<PowerUpType>()
     private var playerNum = 1
+    private var loopThread = Thread(this)
 
     fun start() {
         if (!isRunning) {
+            reset()
             isRunning = true
-            Thread(this).start()
+            loopThread.start()
         }
     }
 
     fun stop() {
         isRunning = false
         count = 0
+    }
+
+    fun pause() {
+        if (count > 720) {
+            isRunning = false
+            gamePanel.advanceGame(0.000000000001)
+        }
+    }
+
+    fun resume() {
+        if (!isRunning) {
+            reset()
+            isRunning = true
+            loopThread.start()
+        }
+    }
+
+
+    fun reset() {
+        count = 0
+        loopThread = Thread(this)
+        gamePanel.getCountLabel().text = "3..."
     }
 
     fun createPowerUp() {
@@ -75,7 +99,10 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: CopyOn
             if (++count >= 720) gamePanel.advanceGame(1.0 / targetFPS)
             if (count == 240) gamePanel.getCountLabel().text = "2.."
             if (count == 480) gamePanel.getCountLabel().text = "1."
-            if (count == 720) gamePanel.setRunning(true)
+            if (count == 720) {
+                gamePanel.setRunning(true)
+                gamePanel.setPaused(false)
+            }
 
             if (count % powerUpCount == 0 && count >= 720) createPowerUp()
 

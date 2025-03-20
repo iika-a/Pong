@@ -39,6 +39,8 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
             GameEvent.ADD_SCORE_TWO_HALF -> scoreKeeper.score2 += 0.5
             GameEvent.CONTINUE_GAME_ONE -> startGame(1)
             GameEvent.CONTINUE_GAME_TWO -> startGame(2)
+            GameEvent.PAUSE_GAME -> pauseGame()
+            GameEvent.RESUME_GAME -> resumeGame()
         }
     }
 
@@ -48,6 +50,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     override fun onGameEnd() {
         gameLoop.stop()
+        gamePanel.setPaused(true)
     }
 
     override fun onSetKeybind(key: Int, index: Int) {
@@ -75,6 +78,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     private fun startGame(paddleNum: Int = 0, gameOptionList: DefaultListModel<GameOption> = DefaultListModel<GameOption>()) {
         menuPanel.isVisible = false
+        gamePanel.setPaused(false)
         gamePanel.setColors(colors)
 
         for (i in 0..<gameOptionList.size) {
@@ -134,11 +138,21 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         gamePanel.requestFocusInWindow()
     }
 
+    private fun pauseGame() {
+        gameLoop.pause()
+    }
+
+    private fun resumeGame() {
+        gameLoop.resume()
+        gamePanel.setPaused(false)
+    }
+
     private fun doMenu() {
         for (i in gameObjectList.lastIndex downTo 2) gameObjectList.removeAt(i)
         gamePanel.setSplitGame(false)
         gamePanel.setDoubleBall(false)
         gamePanel.isVisible = false
+        gameLoop.reset()
         menuPanel.doMenu()
     }
 
