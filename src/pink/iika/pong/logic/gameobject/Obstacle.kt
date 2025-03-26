@@ -1,4 +1,4 @@
-package net.iika.pong.logic.gameobject
+package pink.iika.pong.logic.gameobject
 
 data class Obstacle (
     val xPos: Double,

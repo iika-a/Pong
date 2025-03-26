@@ -1,9 +1,9 @@
-package net.iika.pong.logic
+package pink.iika.pong.logic
 
-import net.iika.pong.util.gameenum.PowerUpType
-import net.iika.pong.util.gameenum.GameOption
-import net.iika.pong.util.listener.ButtonMouseListener
-import net.iika.pong.util.listener.GameListener
+import pink.iika.pong.util.gameenum.PowerUpType
+import pink.iika.pong.util.gameenum.GameOption
+import pink.iika.pong.util.listener.ButtonMouseListener
+import pink.iika.pong.util.listener.GameListener
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.BorderLayout

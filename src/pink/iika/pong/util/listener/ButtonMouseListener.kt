@@ -1,4 +1,4 @@
-package net.iika.pong.util.listener
+package pink.iika.pong.util.listener
 
 import java.awt.Color
 import java.awt.event.MouseEvent

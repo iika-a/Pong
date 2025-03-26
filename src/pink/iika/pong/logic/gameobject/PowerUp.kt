@@ -1,6 +1,6 @@
-package net.iika.pong.logic.gameobject
+package pink.iika.pong.logic.gameobject
 
-import net.iika.pong.util.gameenum.PowerUpType
+import pink.iika.pong.util.gameenum.PowerUpType
 
 data class PowerUp (
     var xPos: Double,

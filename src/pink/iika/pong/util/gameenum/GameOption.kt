@@ -1,4 +1,4 @@
-package net.iika.pong.util.gameenum
+package pink.iika.pong.util.gameenum
 
 enum class GameOption(private val description: String) {
     NORMAL_MODE("Normal Mode"),

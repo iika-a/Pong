@@ -1,15 +1,15 @@
-package net.iika.pong
+package pink.iika.pong
 
 import com.formdev.flatlaf.FlatLightLaf
 
-import net.iika.pong.logic.MenuPanel
-import net.iika.pong.logic.gameobject.Paddle
-import net.iika.pong.logic.ScoreKeeper
-import net.iika.pong.logic.gameobject.GameObject
-import net.iika.pong.logic.GameManager
-import net.iika.pong.logic.GamePanel
-import net.iika.pong.util.gameenum.GameEvent
-import net.iika.pong.util.listener.ButtonMouseListener
+import pink.iika.pong.logic.MenuPanel
+import pink.iika.pong.logic.gameobject.Paddle
+import pink.iika.pong.logic.ScoreKeeper
+import pink.iika.pong.logic.gameobject.GameObject
+import pink.iika.pong.logic.GameManager
+import pink.iika.pong.logic.GamePanel
+import pink.iika.pong.util.gameenum.GameEvent
+import pink.iika.pong.util.listener.ButtonMouseListener
 
 import java.util.concurrent.CopyOnWriteArrayList
 import java.awt.event.KeyEvent

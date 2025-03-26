@@ -1,7 +1,7 @@
-package net.iika.pong.logic
+package pink.iika.pong.logic
 
-import net.iika.pong.logic.gameobject.PowerUp
-import net.iika.pong.util.gameenum.PowerUpType
+import pink.iika.pong.logic.gameobject.PowerUp
+import pink.iika.pong.util.gameenum.PowerUpType
 import kotlin.random.Random
 import java.util.concurrent.CopyOnWriteArrayList
 

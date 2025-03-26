@@ -1,4 +1,4 @@
-package net.iika.pong.logic
+package pink.iika.pong.logic
 
 data class ScoreKeeper (
     var score1: Double,

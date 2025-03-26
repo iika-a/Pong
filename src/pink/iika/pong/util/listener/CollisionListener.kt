@@ -1,9 +1,9 @@
-package net.iika.pong.util.listener
+package pink.iika.pong.util.listener
 
-import net.iika.pong.logic.gameobject.GameObject
-import net.iika.pong.logic.gameobject.Paddle
-import net.iika.pong.logic.gameobject.PowerUp
-import net.iika.pong.util.gameenum.CollisionEvent
+import pink.iika.pong.logic.gameobject.GameObject
+import pink.iika.pong.logic.gameobject.Paddle
+import pink.iika.pong.logic.gameobject.PowerUp
+import pink.iika.pong.util.gameenum.CollisionEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
 interface CollisionListener {
