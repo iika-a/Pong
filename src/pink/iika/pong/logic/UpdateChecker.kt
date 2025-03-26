@@ -1,4 +1,4 @@
-package net.iika.pong.logic
+package pink.iika.pong.logic
 
 import java.net.URI
 import java.net.http.HttpClient
