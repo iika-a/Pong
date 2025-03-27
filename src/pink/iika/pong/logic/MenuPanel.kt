@@ -141,8 +141,6 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
         this.add(gameSetupPanel, "Game Setup")
         this.add(settingsPanel, "Settings")
-
-        setScale(1.0/3, 2.0/3)
     }
 
     private fun createTopPanel(): JPanel {

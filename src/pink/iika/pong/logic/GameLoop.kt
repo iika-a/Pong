@@ -38,7 +38,7 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: CopyOn
     }
 
     fun pause() {
-        if (count > 720) {
+        if (count > targetFPS * 3) {
             isRunning = false
             gamePanel.advanceGame(0.000000000001)
         }
@@ -96,15 +96,15 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: CopyOn
         while (isRunning) {
             val startTime = System.nanoTime()
 
-            if (++count >= 720) gamePanel.advanceGame(1.0 / targetFPS)
-            if (count == 240) gamePanel.getCountLabel().text = "2.."
-            if (count == 480) gamePanel.getCountLabel().text = "1."
-            if (count == 720) {
+            if (++count >= targetFPS * 3) gamePanel.advanceGame(1.0 / targetFPS)
+            if (count == targetFPS) gamePanel.getCountLabel().text = "2.."
+            if (count == targetFPS * 2) gamePanel.getCountLabel().text = "1."
+            if (count == targetFPS * 3) {
                 gamePanel.setRunning(true)
                 gamePanel.setPaused(false)
             }
 
-            if (count % powerUpCount == 0 && count >= 720) createPowerUp()
+            if (count % powerUpCount == 0 && count >= targetFPS * 3) createPowerUp()
 
             val elapsedTime = System.nanoTime() - startTime
 
