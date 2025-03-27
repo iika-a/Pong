@@ -61,6 +61,8 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     private var isDoubleBall = false
     private var colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
     private var isPaused = false
+    private var scaleX = 1.0
+    private var scaleY = 1.0
 
     init {
         this.background = Color.WHITE
@@ -161,6 +163,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     override fun paintComponent(g: Graphics?) {
         val g2d = g as Graphics2D
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g2d.scale(scaleX, scaleY)
         super.paintComponent(g2d)
 
         for (powerUp in powerUpList) {
@@ -617,4 +620,5 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     fun setColors(colors: Array<Color>) { this.colors = colors }
     fun getCountLabel() = this.countLabel
     fun setPaused(p: Boolean) { isPaused = p }
+    fun setScale(sx: Double, sy: Double) { scaleX = sx; scaleY = sy; repaint() }
 }

@@ -4,16 +4,7 @@ import pink.iika.pong.util.gameenum.PowerUpType
 import pink.iika.pong.util.gameenum.GameOption
 import pink.iika.pong.util.listener.ButtonMouseListener
 import pink.iika.pong.util.listener.GameListener
-import java.awt.Graphics
-import java.awt.Graphics2D
-import java.awt.BorderLayout
-import java.awt.CardLayout
-import java.awt.GridBagLayout
-import java.awt.GridBagConstraints
-import java.awt.FlowLayout
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Font
+import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyEvent
@@ -126,6 +117,9 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private var gameOptionList = DefaultListModel<GameOption>()
     private var gameManager: GameListener? = null
 
+    private var scaleX = 1.0
+    private var scaleY = 1.0
+
     init {
         this.layout = cards
         this.addKeyListener(this)
@@ -147,6 +141,8 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
         this.add(gameSetupPanel, "Game Setup")
         this.add(settingsPanel, "Settings")
+
+        setScale(1.0/3, 2.0/3)
     }
 
     private fun createTopPanel(): JPanel {
@@ -769,7 +765,15 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
     override fun paintComponent(g: Graphics?) {
         val g2d = g as Graphics2D
+        g2d.scale(scaleX, scaleY)
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         super.paintComponent(g2d)
+    }
+
+    fun setScale(sx: Double, sy: Double) {
+        scaleX = sx
+        scaleY = sy
+        repaint()
     }
 
     //no implementation needed
