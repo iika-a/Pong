@@ -1,11 +1,13 @@
 package pink.iika.pong.util.gameenum
 
 enum class ClientPacketType {
-    PADDLE_LEFT_DOWN,
-    PADDLE_LEFT_UP,
-    PADDLE_RIGHT_DOWN,
-    PADDLE_RIGHT_UP,
     JOIN_LOBBY,
+    JOIN_ACCEPTED_ACK,
     EXIT_LOBBY,
-    CLIENT_START_GAME
+    PADDLE_LEFT_START,
+    PADDLE_LEFT_END,
+    PADDLE_RIGHT_START,
+    PADDLE_RIGHT_END,
+    START_GAME,
+    STOP_GAME_ACK
 }

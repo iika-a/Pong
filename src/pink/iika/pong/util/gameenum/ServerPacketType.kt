@@ -1,12 +1,11 @@
 package pink.iika.pong.util.gameenum
 
 enum class ServerPacketType {
-    ADD_POWER_UP,
-    REMOVE_POWER_UP,
+    JOIN_ACCEPTED,
+    JOIN_DENIED,
+    ENABLE_START,
+    GAME_TICK,
     COUNTDOWN_TICK,
     START_GAME,
     STOP_GAME,
-    REFRESH_SCORE,
-    REFRESH_GAINS,
-    GAME_TICK
 }
