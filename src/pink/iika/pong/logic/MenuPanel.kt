@@ -1,5 +1,6 @@
 package pink.iika.pong.logic
 
+import pink.iika.pong.util.gameenum.GameEvent
 import pink.iika.pong.util.gameenum.PowerUpType
 import pink.iika.pong.util.gameenum.GameOption
 import pink.iika.pong.util.listener.ButtonMouseListener
@@ -109,9 +110,12 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
     private val singleplayerButton = JButton("Singleplayer").apply { setButtonSettings(this) }
     private val multiplayerButton = JButton("Multiplayer").apply { setButtonSettings(this) }
+    private val onlineModeButton = JButton("Online Multiplayer").apply { setButtonSettings(this) }
 
     private val optionsButton = JButton("Game Options").apply { setButtonSettings(this) }
     private val startGameButton = JButton("Start Game!").apply { setButtonSettings(this) }
+
+    private val startOnlineGameButton = JButton("Start Game!").apply { setButtonSettings(this) }
 
     private var currentMenu = "Main Menu"
     private var gameOptionList = DefaultListModel<GameOption>()
@@ -141,6 +145,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
         this.add(gameSetupPanel, "Game Setup")
         this.add(settingsPanel, "Settings")
+        this.add(createOnlineMenu().apply { background = Color(0xFFD1DC) }, "Online")
     }
 
     private fun createTopPanel(): JPanel {
@@ -217,7 +222,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
     private fun createPlayersMenu(): JPanel {
         val panel = JPanel(GridBagLayout())
-        val playersLabel = JLabel("How many players?").apply { font = menuFont }
+        val playersLabel = JLabel("How are you playing?").apply { font = menuFont }
         playersLabel.horizontalAlignment = JLabel.CENTER
 
         val constraints = GridBagConstraints().apply {
@@ -230,6 +235,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         panel.add(playersLabel, constraints)
         panel.add(singleplayerButton, constraints)
         panel.add(multiplayerButton, constraints)
+        panel.add(onlineModeButton, constraints)
 
         return panel
     }
@@ -252,6 +258,22 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         panel.add(scrollPane, constraints)
         panel.add(optionsButton, constraints)
         panel.add(startGameButton, constraints)
+
+        return panel
+    }
+
+    private fun createOnlineMenu(): JPanel {
+        val panel = JPanel(GridBagLayout())
+
+        val constraints = GridBagConstraints().apply {
+            gridx = 0
+            gridy = GridBagConstraints.RELATIVE
+            insets.set(10, 10, 10, 10)
+            fill = GridBagConstraints.HORIZONTAL
+        }
+
+        startOnlineGameButton.isVisible = false
+        panel.add(startOnlineGameButton, constraints)
 
         return panel
     }
@@ -562,11 +584,15 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
                 gameOptionList.addElement(GameOption.MULTIPLAYER)
                 showMenu("Confirm", gameButtonsPanel)
             }
-
-            startGameButton -> {
-                gameManager?.onGameStart(gameOptionList)
+            onlineModeButton -> {
+                showMenu("Online", this)
+                gameManager?.onGameEvent(GameEvent.START_CLIENT)
             }
+
+            startGameButton -> gameManager?.onGameStart(gameOptionList)
             optionsButton -> showMenu("Options", gameButtonsPanel)
+            startOnlineGameButton -> gameManager?.onGameEvent(GameEvent.START_ONLINE_GAME)
+
 
             resetButton -> {
                 scoreKeeper.resetScore()
@@ -777,4 +803,6 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     //no implementation needed
     override fun keyTyped(e: KeyEvent?) {}
     override fun keyReleased(e: KeyEvent?) {}
+
+    fun setOnlineGameButton(b: Boolean) { startOnlineGameButton.isVisible = b }
 }

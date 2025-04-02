@@ -319,6 +319,10 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                             when (otherObject.side) {
                                 1 -> {
                                     if (gameObject.yPosition + gameObject.height >= otherObject.yPosition) {
+                                        println(gameObject.yPosition)
+                                        println(gameObject.height)
+                                        println(otherObject.yPosition)
+                                        println(otherObject.paddleHeight)
                                         val intersect = otherObject.yPosition - gameObject.yPosition - gameObject.height
                                         collisionListener.onCollision(CollisionEvent.BALL_PADDLE, gameObject, otherObject, intersect)
                                     }

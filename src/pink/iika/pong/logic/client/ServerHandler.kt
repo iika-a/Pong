@@ -6,8 +6,8 @@ import java.net.InetAddress
 import kotlin.concurrent.thread
 
 class ServerHandler(private val port: Int) {
-    val socket = DatagramSocket()
-    val address: InetAddress = InetAddress.getByName("172.20.10.8")
+    private val socket = DatagramSocket()
+    private val address: InetAddress = InetAddress.getByName("172.16.96.221")
 
     fun startReceiver(onPacket: (DatagramPacket) -> Unit) {
         thread(start = true) {

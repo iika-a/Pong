@@ -6,6 +6,5 @@ enum class ServerPacketType {
     ENABLE_START,
     GAME_TICK,
     COUNTDOWN_TICK,
-    START_GAME,
     STOP_GAME,
 }
