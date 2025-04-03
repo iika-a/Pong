@@ -7,4 +7,5 @@ enum class ServerPacketType {
     GAME_TICK,
     COUNTDOWN_TICK,
     STOP_GAME,
+    ROOMS
 }

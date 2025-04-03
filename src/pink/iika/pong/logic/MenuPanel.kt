@@ -12,14 +12,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.awt.event.ItemEvent
 import java.awt.event.ItemListener
-import javax.swing.DefaultListModel
-import javax.swing.JScrollPane
-import javax.swing.JPanel
-import javax.swing.JLabel
-import javax.swing.JButton
-import javax.swing.JList
-import javax.swing.JColorChooser
-import javax.swing.JCheckBox
+import javax.swing.*
 import javax.swing.border.LineBorder
 import kotlin.system.exitProcess
 
@@ -149,13 +142,12 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     }
 
     private fun createTopPanel(): JPanel {
-        val panel = JPanel()
-
-        scoreLabel.horizontalAlignment = JLabel.LEFT
-        panel.add(scoreLabel)
-
+        val panel = JPanel(BorderLayout())
+        scoreLabel.horizontalAlignment = JLabel.CENTER
+        panel.add(scoreLabel, BorderLayout.CENTER) // or BorderLayout.WEST if you want it stuck left
         return panel
     }
+
 
     private fun createBottomPanel(): JPanel {
         val panel = JPanel(FlowLayout(FlowLayout.CENTER, 10, 10))
@@ -208,7 +200,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
             gridx = 0
             gridy = GridBagConstraints.RELATIVE
             insets.set(10, 10, 10, 10)
-            fill = GridBagConstraints.HORIZONTAL
+            fill = GridBagConstraints.BOTH
         }
 
         panel.add(mainLabel, constraints)
@@ -229,7 +221,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
             gridx = 0
             gridy = GridBagConstraints.RELATIVE
             insets.set(10, 10, 10, 10)
-            fill = GridBagConstraints.HORIZONTAL
+            fill = GridBagConstraints.BOTH
         }
 
         panel.add(playersLabel, constraints)
@@ -251,7 +243,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
             gridx = 0
             gridy = GridBagConstraints.RELATIVE
             insets.set(10, 10, 10, 10)
-            fill = GridBagConstraints.HORIZONTAL
+            fill = GridBagConstraints.BOTH
         }
 
         panel.add(confirmLabel, constraints)
@@ -269,7 +261,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
             gridx = 0
             gridy = GridBagConstraints.RELATIVE
             insets.set(10, 10, 10, 10)
-            fill = GridBagConstraints.HORIZONTAL
+            fill = GridBagConstraints.BOTH
         }
 
         startOnlineGameButton.isVisible = false
@@ -280,75 +272,106 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
     private fun createOptionsMenu(): JPanel {
         val panel = JPanel(BorderLayout()).apply { background = Color(0xFFD1DC) }
-        val buttonPanel = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC); preferredSize = Dimension(1350, 450) }
+
+        val buttonPanel = JPanel(GridBagLayout()).apply {
+            background = Color(0xFFD1DC)
+        }
+
         val buttonPanel1 = JPanel(FlowLayout()).apply { background = Color(0xFFD1DC) }
         val buttonPanel2 = JPanel(FlowLayout()).apply { background = Color(0xFFD1DC) }
         val buttonPanel3 = JPanel(FlowLayout()).apply { background = Color(0xFFD1DC) }
         val buttonPanel4 = JPanel(FlowLayout()).apply { background = Color(0xFFD1DC) }
-        val sidePanel = JPanel(BorderLayout()).apply { background = Color(0xFFD1DC); preferredSize = Dimension(550, 450) }
-        val checkBoxPanel  = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC); preferredSize = Dimension(300, 450) }
-        val scrollPane = JScrollPane(JList(gameOptionList).apply { font = menuFont.deriveFont(18f) }).apply { preferredSize = Dimension(200, 400) }
-        val panePanel = JPanel(BorderLayout()).apply { background = Color(0xFFD1DC); preferredSize = Dimension(250, 450) }
 
-        val modeLabel = JLabel("Game Modes", JLabel.CENTER).apply { font = menuFont }
-        val mapLabel = JLabel("Game Maps", JLabel.CENTER).apply { font = menuFont }
-        val blocksLabel = JLabel("Number of Obstacles (Random Obstacles Only)", JLabel.CENTER).apply { font = menuFont }
-        val specialLabel = JLabel("Special Modifiers", JLabel.CENTER).apply { font = menuFont }
-        val optionsLabel = JLabel("Selected Options:", JLabel.CENTER).apply { font = menuFont; preferredSize = Dimension(10, 30) }
+        val checkBoxPanel = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC) }
+        val scrollPane = JScrollPane(JList(gameOptionList).apply {
+            font = menuFont.deriveFont(18f)
+        }).apply {
+            preferredSize = Dimension(200, 400)
+        }
+
+        val optionsLabel = JLabel("Selected Options:", JLabel.CENTER).apply {
+            font = menuFont
+            preferredSize = Dimension(10, 30)
+        }
+
+        val panePanel = JPanel(BorderLayout()).apply {
+            background = Color(0xFFD1DC)
+            preferredSize = Dimension(250, 450)
+            add(optionsLabel, BorderLayout.NORTH)
+            add(scrollPane, BorderLayout.CENTER)
+        }
+
+        val sidePanel = JPanel(BorderLayout()).apply {
+            background = Color(0xFFD1DC)
+            add(panePanel, BorderLayout.EAST)
+            add(checkBoxPanel, BorderLayout.CENTER)
+        }
+
+        val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buttonPanel, sidePanel).apply {
+            resizeWeight = 0.65 // Gives 65% width to the buttonPanel by default
+            dividerSize = 8
+            isOneTouchExpandable = true
+            preferredSize = Dimension(1200, 500)
+        }
 
         val constraints = GridBagConstraints().apply {
             gridx = 0
             gridy = 0
             weightx = 1.0
             weighty = 0.0
-            fill = GridBagConstraints.HORIZONTAL
+            fill = GridBagConstraints.BOTH
             anchor = GridBagConstraints.CENTER
             insets.set(10, 10, 10, 10)
         }
 
-        buttonPanel.add(modeLabel, constraints)
-        checkBoxPanel.add(powerUpLabel, constraints)
+        val modeLabel = JLabel("Game Modes", JLabel.CENTER).apply { font = menuFont }
+        val mapLabel = JLabel("Game Maps", JLabel.CENTER).apply { font = menuFont }
+        val blocksLabel = JLabel("Number of Obstacles (Random Obstacles Only)", JLabel.CENTER).apply { font = menuFont }
+        val specialLabel = JLabel("Special Modifiers", JLabel.CENTER).apply { font = menuFont }
 
+        // Add components to buttonPanel
+        buttonPanel.add(modeLabel, constraints)
         constraints.gridy++
         for (button in modeButtonList) buttonPanel1.add(button)
         buttonPanel.add(buttonPanel1, constraints)
-        checkBoxPanel.add(increasePaddleSizeBox, constraints)
 
         constraints.gridy++
         buttonPanel.add(mapLabel, constraints)
-        checkBoxPanel.add(increasePaddleSpeedBox, constraints)
-
         constraints.gridy++
         for (button in mapButtonList) buttonPanel2.add(button)
         buttonPanel.add(buttonPanel2, constraints)
-        checkBoxPanel.add(randomizeBallSpeedBox, constraints)
 
         constraints.gridy++
         buttonPanel.add(blocksLabel, constraints)
-        checkBoxPanel.add(randomizeBallAngleBox, constraints)
-
         constraints.gridy++
         for (button in blocksButtonList) buttonPanel3.add(button)
         buttonPanel.add(buttonPanel3, constraints)
-        checkBoxPanel.add(spawnBallBox, constraints)
 
         constraints.gridy++
         buttonPanel.add(specialLabel, constraints)
-
         constraints.gridy++
         for (button in specialButtonList) buttonPanel4.add(button)
         buttonPanel.add(buttonPanel4, constraints)
 
-        panePanel.add(optionsLabel, BorderLayout.NORTH)
-        panePanel.add(scrollPane, BorderLayout.CENTER)
-        sidePanel.add(panePanel, BorderLayout.EAST)
-        sidePanel.add(checkBoxPanel, BorderLayout.WEST)
+        // Add checkboxes to checkboxPanel
+        val checkBoxConstraints = GridBagConstraints().apply {
+            gridx = 0
+            gridy = 0
+            weightx = 1.0
+            anchor = GridBagConstraints.NORTHWEST
+            insets.set(5, 5, 5, 5)
+        }
 
-        panel.add(sidePanel, BorderLayout.CENTER)
-        panel.add(buttonPanel, BorderLayout.WEST)
+        checkBoxPanel.add(powerUpLabel, checkBoxConstraints)
+        for (box in powerUpBoxList) {
+            checkBoxConstraints.gridy++
+            checkBoxPanel.add(box, checkBoxConstraints)
+        }
 
+        panel.add(splitPane, BorderLayout.CENTER)
         return panel
     }
+
 
     private fun createKeybindsPanel(): JPanel {
         val panel = JPanel(GridBagLayout())
@@ -366,7 +389,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
             gridy = 0
             weightx = 1.0
             weighty = 0.0
-            fill = GridBagConstraints.HORIZONTAL
+            fill = GridBagConstraints.BOTH
             anchor = GridBagConstraints.CENTER
             insets.set(10, 10, 10, 10)
         }
@@ -399,7 +422,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
             gridy = 0
             weightx = 1.0
             weighty = 0.0
-            fill = GridBagConstraints.HORIZONTAL
+            fill = GridBagConstraints.BOTH
             anchor = GridBagConstraints.CENTER
             insets.set(10, 10, 10, 10)
         }
@@ -789,7 +812,6 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
     override fun paintComponent(g: Graphics?) {
         val g2d = g as Graphics2D
-        g2d.scale(scaleX, scaleY)
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         super.paintComponent(g2d)
     }
@@ -797,8 +819,28 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     fun setScale(sx: Double, sy: Double) {
         scaleX = sx
         scaleY = sy
+        scaleComponents(this, sx, sy)
+        revalidate()
         repaint()
     }
+
+
+    private fun scaleComponents(container: Container, sx: Double, sy: Double) {
+        for (component in container.components) {
+            if (component is JButton || component is JLabel || component is JScrollPane) {
+                val size = component.preferredSize
+                val newWidth = (size.width * sx).toInt()
+                val newHeight = (size.height * sy).toInt()
+                component.preferredSize = Dimension(newWidth, newHeight)
+
+                val currentFont = component.font
+                component.font = currentFont.deriveFont((currentFont.size * sy).toFloat())
+            } else if (component is Container) {
+                scaleComponents(component, sx, sy)
+            }
+        }
+    }
+
 
     //no implementation needed
     override fun keyTyped(e: KeyEvent?) {}

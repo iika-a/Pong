@@ -29,6 +29,7 @@ class GameClient(private val handler: ServerHandler, private val contentPanel: O
             ServerPacketType.ENABLE_START -> gameManager.onGameEvent(GameEvent.ENABLE_START)
             ServerPacketType.COUNTDOWN_TICK -> {}
             ServerPacketType.STOP_GAME -> {}
+            ServerPacketType.ROOMS -> {}
         }
     }
 

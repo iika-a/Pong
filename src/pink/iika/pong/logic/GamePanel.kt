@@ -163,7 +163,6 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     override fun paintComponent(g: Graphics?) {
         val g2d = g as Graphics2D
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-        g2d.scale(scaleX, scaleY)
         super.paintComponent(g2d)
 
         for (powerUp in powerUpList) {
@@ -172,6 +171,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                 1 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition - 2, this.height - 10 - 2.0, 54.0, 12.0))
                 2 -> g2d.fill(Rectangle2D.Double(powerUp.xPosition - 2, 0.0, 54.0, 12.0))
             }
+            powerUp.width *= scaleX
 
             when (powerUp.type) {
                 PowerUpType.INCREASE_PADDLE_SIZE -> g2d.color = Color.RED
@@ -188,6 +188,9 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         }
 
         for (obstacle in gameObjectList.filterIsInstance<Obstacle>()) {
+            obstacle.width *= scaleX
+            obstacle.height *= scaleY
+
             g2d.color = Color.BLACK
             g2d.fill(Rectangle2D.Double(obstacle.xPosition - 2, obstacle.yPosition - 2, obstacle.width + 4, obstacle.height + 4))
 
@@ -244,13 +247,13 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         for (gameObject in gameObjectList) {
             when (gameObject) {
                 is Ball -> {
-                    gameObject.move(gameObject.xVelocity * dt, gameObject.yVelocity * dt)
+                    gameObject.move(gameObject.xVelocity * dt * scaleX, gameObject.yVelocity * dt * scaleY)
                     speedUpBall(5 * dt)
                 }
 
                 is Paddle -> {
-                    if (gameObject.leftPress) gameObject.move(-gameObject.paddleSpeed * dt, 0.0)
-                    if (gameObject.rightPress) gameObject.move(gameObject.paddleSpeed * dt, 0.0)
+                    if (gameObject.leftPress) gameObject.move(-gameObject.paddleSpeed * dt * scaleX, 0.0)
+                    if (gameObject.rightPress) gameObject.move(gameObject.paddleSpeed * dt * scaleX, 0.0)
                 }
             }
         }
@@ -319,10 +322,6 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                             when (otherObject.side) {
                                 1 -> {
                                     if (gameObject.yPosition + gameObject.height >= otherObject.yPosition) {
-                                        println(gameObject.yPosition)
-                                        println(gameObject.height)
-                                        println(otherObject.yPosition)
-                                        println(otherObject.paddleHeight)
                                         val intersect = otherObject.yPosition - gameObject.yPosition - gameObject.height
                                         collisionListener.onCollision(CollisionEvent.BALL_PADDLE, gameObject, otherObject, intersect)
                                     }
@@ -364,7 +363,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
 
                     for (powerUp in powerUpList) {
                         if (((powerUp.xPosition in gameObject.xPosition..(gameObject.xPosition + gameObject.width)) || (powerUp.xPosition + powerUp.width in gameObject.xPosition..(gameObject.xPosition + gameObject.width))) && gameObject.side == powerUp.side) {
-                            collisionListener.onCollision(CollisionEvent.PADDLE_POWERUP, gameObject, powerUp, 0.0, gameObjectList)
+                            collisionListener.onCollision(CollisionEvent.PADDLE_POWERUP, gameObject, powerUp, 0.0, gameObjectList, scaleX)
                             powerUpList.remove(powerUp)
                         }
                     }
@@ -380,6 +379,9 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
             if (gameObject is Ball) {
                 gameObject.xPosition = ((this.width/4)..(2 * this.width/3)).random().toDouble()
                 gameObject.yPosition = this.height / 2.0
+                gameObject.ballRadius *= scaleX
+                gameObject.height *= scaleY
+                gameObject.width *= scaleX
 
                 if (gameObjectList.filterIsInstance<Obstacle>().isNotEmpty() && gameObjectList.filterIsInstance<Obstacle>()[0] == Obstacle(200.0, 200.0, this.width - 400.0, this.height - 400.0)) gameObject.isImmune = true
 
@@ -402,7 +404,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
         for (paddle in gameObjectList.filterIsInstance<Paddle>()) {
             if (playerNum == 2) {
                 if (paddleNum == 0 || paddle.side == paddleNum) {
-                    paddle.width = 150.0
+                    paddle.width = 150.0 * scaleX
                     paddle.paddleSpeed = 800.0
                     paddle.xPosition = this.width / 2 - paddle.width / 2
                 }

@@ -15,7 +15,7 @@ import kotlin.random.Random
 class GameCollisionListener: CollisionListener {
     private var direction = 0
 
-    override fun onCollision(event: CollisionEvent, obj1: GameObject, obj2: GameObject, intersect: Double, gameObjectList: CopyOnWriteArrayList<GameObject>) {
+    override fun onCollision(event: CollisionEvent, obj1: GameObject, obj2: GameObject, intersect: Double, gameObjectList: CopyOnWriteArrayList<GameObject>, scale: Double) {
         when (event) {
             CollisionEvent.BALL_PADDLE -> {
                 obj1.yVelocity *= -1
@@ -48,13 +48,13 @@ class GameCollisionListener: CollisionListener {
             CollisionEvent.PADDLE_WALL -> {
                 obj1.xPosition += intersect
             }
-            CollisionEvent.PADDLE_POWERUP -> applyPowerUp(obj1 as Paddle, obj2 as PowerUp, gameObjectList)
+            CollisionEvent.PADDLE_POWERUP -> applyPowerUp(obj1 as Paddle, obj2 as PowerUp, gameObjectList, scale)
         }
     }
 
-    override fun applyPowerUp(paddle: Paddle, powerUp: PowerUp, gameObjectList: CopyOnWriteArrayList<GameObject>) {
+    override fun applyPowerUp(paddle: Paddle, powerUp: PowerUp, gameObjectList: CopyOnWriteArrayList<GameObject>, scale: Double) {
         when (powerUp.type) {
-            PowerUpType.INCREASE_PADDLE_SIZE -> paddle.move(0.0, 0.0, (15..25).random().toDouble(), 0.0)
+            PowerUpType.INCREASE_PADDLE_SIZE -> paddle.move(0.0, 0.0, (15..25).random().toDouble() * scale, 0.0)
             PowerUpType.INCREASE_PADDLE_SPEED -> paddle.paddleSpeed += 100
             PowerUpType.RANDOMIZE_BALL_ANGLE -> {
                 val ball = gameObjectList.filterIsInstance<Ball>().random()

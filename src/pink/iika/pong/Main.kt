@@ -13,15 +13,14 @@ import pink.iika.pong.logic.client.ServerHandler
 import pink.iika.pong.logic.gameobject.Ball
 import pink.iika.pong.util.gameenum.GameEvent
 import pink.iika.pong.util.listener.ButtonMouseListener
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Dimension
+import java.awt.Font
 
 import java.util.concurrent.CopyOnWriteArrayList
 import java.awt.event.KeyEvent
-import javax.swing.OverlayLayout
-import javax.swing.SwingUtilities
-import javax.swing.UIManager
-import javax.swing.UnsupportedLookAndFeelException
-import javax.swing.JFrame
-import javax.swing.JPanel
+import javax.swing.*
 
 fun main() {
     val gameObjectList = CopyOnWriteArrayList<GameObject>()
@@ -76,7 +75,6 @@ fun main() {
         contentPane.add(onlineGamePanel)
 
         gameFrame.contentPane = contentPane
-        gameFrame.isVisible = true
 
         gameFrame.addWindowFocusListener(object : java.awt.event.WindowFocusListener {
             override fun windowGainedFocus(e: java.awt.event.WindowEvent?) {
@@ -98,5 +96,56 @@ fun main() {
         onlineGamePanel.setGameListener(gameManager)
 
         gameManager.onGameEvent(GameEvent.EXIT_TO_MENU)
+
+        val resolutionFrame = JFrame("Resolution Select")
+        resolutionFrame.setSize(300, 125)
+        resolutionFrame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        resolutionFrame.isResizable = false
+        val resolutionPanel = JPanel().apply { background = Color(0xFFD1DC); layout = BorderLayout() }
+        resolutionPanel.add(JPanel().apply { background = Color(0xFFD1DC) }, BorderLayout.NORTH)
+        resolutionPanel.add(JLabel("Select Resolution:").apply { setLabelSettings(this) } , BorderLayout.CENTER)
+
+        val bottomPanel = JPanel().apply { background = Color(0xFFD1DC) }
+        val comboBox = JComboBox<String>().apply {
+            addItem("1280 x 720")
+            addItem("1600 x 900")
+            addItem("1920 x 1080")
+            addItem("2560 x 1440")
+            addItem("3840 x 2160")
+            selectedItem = "1920 x 1080"
+        }
+        bottomPanel.add(comboBox)
+        bottomPanel.add(JButton("Confirm").apply { addActionListener {
+            var scale = 1.0
+            when (comboBox.selectedItem) {
+                "1280 x 720" ->  scale = 2/3.0
+                "1600 x 900" -> scale = 5/6.0
+                "1920 x 1080" -> scale = 1.0
+                "2560 x 1440" -> scale = 4/3.0
+                "3840 x 2160" -> scale = 2.0
+            }
+
+            gamePanel.setScale(scale, scale)
+            menuPanel.setScale(scale, scale)
+            onlineGamePanel.setScale(scale, scale)
+            gameFrame.setSize((1920 * scale).toInt(), (1080 * scale).toInt())
+            resolutionFrame.dispose()
+            gameFrame.isVisible = true
+        }})
+        resolutionPanel.add(bottomPanel, BorderLayout.SOUTH)
+
+        resolutionFrame.add(resolutionPanel)
+        resolutionFrame.isVisible = true
+        resolutionFrame.setLocationRelativeTo(null)
     }
+}
+
+private fun setLabelSettings(label: JLabel) {
+    val labelSize = Dimension(275, 85)
+    val menuFont = Font("Segoe UI", 0, 20)
+
+    label.preferredSize = labelSize
+    label.font = menuFont
+    label.horizontalAlignment = JLabel.CENTER
+    label.verticalAlignment = JLabel.TOP
 }

@@ -18,15 +18,14 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
 class OnlineGamePanel(private val handler: ServerHandler, private val gameObjectList: CopyOnWriteArrayList<GameObject>): JPanel(), KeyListener {
-    private val scaleX = 1.0
-    private val scaleY = 1.0
+    private var scaleX = 1.0
+    private var scaleY = 1.0
     private var colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
     private var gameManager: GameListener? = null
 
     override fun paintComponent(g: Graphics?) {
         val g2d = g as Graphics2D
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-        g2d.scale(scaleX, scaleY)
         super.paintComponent(g2d)
 
         for (gameObject in gameObjectList) {
@@ -89,4 +88,5 @@ class OnlineGamePanel(private val handler: ServerHandler, private val gameObject
     override fun keyTyped(e: KeyEvent?) {}
     fun setGameListener(listener: GameListener) { this.gameManager = listener }
     fun setColors(colors: Array<Color>) { this.colors = colors }
+    fun setScale(sx: Double, sy: Double) { scaleX = sx; scaleY = sy; repaint() }
 }
