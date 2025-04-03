@@ -68,6 +68,11 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
                 0, 2 -> paddle.leftKey = key
                 1, 3 -> paddle.rightKey = key
             }
+
+            when (index) {
+                0 -> onlineGamePanel.setLeftControl(key)
+                1 -> onlineGamePanel.setRightControl(key)
+            }
         }
     }
 

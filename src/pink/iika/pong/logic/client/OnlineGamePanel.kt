@@ -22,6 +22,7 @@ class OnlineGamePanel(private val handler: ServerHandler, private val gameObject
     private var scaleY = 1.0
     private var colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
     private var gameManager: GameListener? = null
+    private val controls = mutableListOf(KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT)
 
     override fun paintComponent(g: Graphics?) {
         val g2d = g as Graphics2D
@@ -59,15 +60,15 @@ class OnlineGamePanel(private val handler: ServerHandler, private val gameObject
 
     override fun keyPressed(e: KeyEvent?) {
         when (e?.keyCode) {
-            KeyEvent.VK_LEFT -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_LEFT_START.ordinal.toByte()))
-            KeyEvent.VK_RIGHT -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_RIGHT_START.ordinal.toByte()))
+            controls[0] -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_LEFT_START.ordinal.toByte()))
+            controls[1] -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_RIGHT_START.ordinal.toByte()))
         }
     }
 
     override fun keyReleased(e: KeyEvent?) {
         when (e?.keyCode) {
-            KeyEvent.VK_LEFT -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_LEFT_END.ordinal.toByte()))
-            KeyEvent.VK_RIGHT -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_RIGHT_END.ordinal.toByte()))
+            controls[0] -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_LEFT_END.ordinal.toByte()))
+            controls[1] -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_RIGHT_END.ordinal.toByte()))
         }
     }
 
@@ -89,4 +90,6 @@ class OnlineGamePanel(private val handler: ServerHandler, private val gameObject
     fun setGameListener(listener: GameListener) { this.gameManager = listener }
     fun setColors(colors: Array<Color>) { this.colors = colors }
     fun setScale(sx: Double, sy: Double) { scaleX = sx; scaleY = sy; repaint() }
+    fun setLeftControl(left: Int) { controls[0] = left }
+    fun setRightControl(right: Int) { controls[1] = right }
 }
