@@ -419,7 +419,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
                 } else if (paddle.side == 1) {
                     paddle.xPosition = this.width / 2 - paddle.width / 2
 
-                    paddle.width = 150.0
+                    paddle.width = 150.0 * scaleX
                     paddle.paddleSpeed = 800.0
                     if (isSplitGame && i % 2 == 0) paddle.xPosition = this.width / 2 + this.width / 4 - paddle.width / 2
                     if (isSplitGame && i++ % 2 == 1) paddle.xPosition = this.width / 2 - this.width / 4 - paddle.width / 2
