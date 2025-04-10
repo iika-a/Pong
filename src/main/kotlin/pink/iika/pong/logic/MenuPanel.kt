@@ -20,7 +20,7 @@ import kotlin.system.exitProcess
 
 class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseListener: ButtonMouseListener): JPanel(), ActionListener, KeyListener, ItemListener {
     private var isUpToDate = false
-    private val currentVersion = "v1.3.0"
+    private val currentVersion = "v1.3.0-beta"
     private val gameSetupPanel = JPanel(BorderLayout())
     private val settingsPanel = JPanel(BorderLayout())
     private val cards = CardLayout()
