@@ -33,24 +33,24 @@ class OnlineGamePanel(private val handler: ServerHandler, private val gameObject
             when (gameObject) {
                 is Ball -> {
                     g2d.color = Color.BLACK
-                    g2d.fill(Ellipse2D.Double(gameObject.xPosition - 2, gameObject.yPosition - 2, gameObject.width + 4, gameObject.height + 4))
+                    g2d.fill(Ellipse2D.Double((gameObject.xPosition - 2) * scaleX, (gameObject.yPosition - 2) * scaleY, (gameObject.width + 4) * scaleX, (gameObject.height + 4) * scaleY))
                     g2d.color = colors[3]
-                    g2d.fill(Ellipse2D.Double(gameObject.xPosition, gameObject.yPosition, gameObject.width, gameObject.height))
+                    g2d.fill(Ellipse2D.Double(gameObject.xPosition * scaleX, gameObject.yPosition * scaleY, gameObject.width * scaleX, gameObject.height * scaleY))
                 }
 
                 is Paddle -> {
                     g2d.color = Color.BLACK
                     when (gameObject.side) {
                         2 -> {
-                            g2d.fill(Rectangle2D.Double(gameObject.xPosition - 2, 0.0, gameObject.width + 4, gameObject.paddleHeight + 2))
+                            g2d.fill(Rectangle2D.Double((gameObject.xPosition - 2) * scaleX, 0.0, (gameObject.width + 4) * scaleX, (gameObject.paddleHeight + 2) * scaleY))
                             g2d.color = colors[1]
-                            g2d.fill(Rectangle2D.Double(gameObject.xPosition, 0.0, gameObject.width, gameObject.paddleHeight))
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition * scaleX, 0.0, gameObject.width * scaleX, gameObject.paddleHeight * scaleY))
                         }
 
                         1 -> {
-                            g2d.fill(Rectangle2D.Double(gameObject.xPosition - 2, this.height - gameObject.paddleHeight - 2, gameObject.width + 4, gameObject.paddleHeight + 4))
+                            g2d.fill(Rectangle2D.Double((gameObject.xPosition - 2) * scaleX, this.height - gameObject.paddleHeight * scaleY - 2, (gameObject.width + 4) * scaleX, (gameObject.paddleHeight + 4) * scaleY))
                             g2d.color = colors[0]
-                            g2d.fill(Rectangle2D.Double(gameObject.xPosition, this.height - gameObject.paddleHeight, gameObject.width, gameObject.paddleHeight))
+                            g2d.fill(Rectangle2D.Double(gameObject.xPosition * scaleX, this.height - (gameObject.paddleHeight) * scaleY, gameObject.width * scaleX, gameObject.paddleHeight * scaleY))
                         }
                     }
                 }
@@ -60,15 +60,16 @@ class OnlineGamePanel(private val handler: ServerHandler, private val gameObject
 
     override fun keyPressed(e: KeyEvent?) {
         when (e?.keyCode) {
-            controls[0] -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_LEFT_START.ordinal.toByte()))
-            controls[1] -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_RIGHT_START.ordinal.toByte()))
+            controls[0] -> handler.sendPacket(ClientPacketType.PADDLE_LEFT_START, byteArrayOf())
+            controls[1] -> handler.sendPacket(ClientPacketType.PADDLE_RIGHT_START, byteArrayOf())
+            KeyEvent.VK_ESCAPE -> handler.sendPacket(ClientPacketType.EXIT_ROOM, byteArrayOf())
         }
     }
 
     override fun keyReleased(e: KeyEvent?) {
         when (e?.keyCode) {
-            controls[0] -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_LEFT_END.ordinal.toByte()))
-            controls[1] -> handler.sendPacket(byteArrayOf(ClientPacketType.PADDLE_RIGHT_END.ordinal.toByte()))
+            controls[0] -> handler.sendPacket(ClientPacketType.PADDLE_LEFT_END, byteArrayOf())
+            controls[1] -> handler.sendPacket(ClientPacketType.PADDLE_RIGHT_END, byteArrayOf())
         }
     }
 

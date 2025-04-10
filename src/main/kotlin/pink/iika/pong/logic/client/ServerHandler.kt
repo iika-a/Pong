@@ -1,5 +1,6 @@
 package pink.iika.pong.logic.client
 
+import pink.iika.pong.util.gameenum.ClientPacketType
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -24,9 +25,10 @@ class ServerHandler(private val port: Int) {
         }
     }
 
-    fun sendPacket(data: ByteArray) {
+    fun sendPacket(header: ClientPacketType, data: ByteArray) {
         try {
-            val packet = DatagramPacket(data, data.size, address, port)
+            val payload = byteArrayOf(header.ordinal.toByte()) + data
+            val packet = DatagramPacket(payload, payload.size, address, port)
             socket.send(packet)
         } catch (e: Exception) {
             e.printStackTrace()

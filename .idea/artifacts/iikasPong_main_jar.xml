@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="iikasPong.main:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/iikasPong_main_jar</output-path>
+    <root id="archive" name="iikasPong.main.jar">
+      <element id="module-output" name="iikasPong.main" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.20/aa8ca79cd50578314f6d1180c47cbe14c0fee567/kotlin-stdlib-2.1.20.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.formdev/flatlaf/3.5.4/cd61f9fc2550473fdacebc205a68e24a065f6fdf/flatlaf-3.5.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-serialization-json-jvm/1.8.1/4de3bace4b175753df5484d2acd74c14bfeb5be9/kotlinx-serialization-json-jvm-1.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-serialization-core-jvm/1.8.1/510cb839cce9a3e708052d480a6fbf4a7274dfcd/kotlinx-serialization-core-jvm-1.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar" path-in-jar="/" />
+      <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+    </root>
+  </artifact>
+</component>

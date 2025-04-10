@@ -1,5 +1,6 @@
 package pink.iika.pong.logic
 
+import pink.iika.pong.logic.server.GameRoom
 import pink.iika.pong.util.gameenum.GameEvent
 import pink.iika.pong.util.gameenum.PowerUpType
 import pink.iika.pong.util.gameenum.GameOption
@@ -108,6 +109,19 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private val optionsButton = JButton("Game Options").apply { setButtonSettings(this) }
     private val startGameButton = JButton("Start Game!").apply { setButtonSettings(this) }
 
+    private val roomsLabel = JLabel("Current Rooms:").apply {
+        preferredSize = Dimension(275, 85)
+        font = Font("Segoe UI", 0, 28)
+        horizontalAlignment = JLabel.CENTER
+        verticalAlignment = JLabel.BOTTOM
+    }
+    private val roomsList = DefaultListModel<GameRoom>()
+    private val roomsJList = JList(roomsList)
+    private val roomsPane = JScrollPane(roomsJList)
+    private val refreshButton = JButton("Refresh Rooms").apply { setButtonSettings(this) }
+    private val createRoomButton = JButton("Create Room").apply { setButtonSettings(this) }
+    private val joinRoomButton = JButton("Join Room").apply { setButtonSettings(this) }
+
     private val startOnlineGameButton = JButton("Start Game!").apply { setButtonSettings(this) }
 
     private var currentMenu = "Main Menu"
@@ -138,7 +152,8 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
 
         this.add(gameSetupPanel, "Game Setup")
         this.add(settingsPanel, "Settings")
-        this.add(createOnlineMenu().apply { background = Color(0xFFD1DC) }, "Online")
+        this.add(createOnlineMenu(), "Online")
+        this.add(createRoomMenu(), "Room")
     }
 
     private fun createTopPanel(): JPanel {
@@ -255,7 +270,26 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     }
 
     private fun createOnlineMenu(): JPanel {
-        val panel = JPanel(GridBagLayout())
+        val panel = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC) }
+
+        val constraints = GridBagConstraints().apply {
+            gridx = 0
+            gridy = GridBagConstraints.RELATIVE
+            insets.set(10, 10, 10, 10)
+            fill = GridBagConstraints.BOTH
+        }
+
+        panel.add(roomsLabel, constraints)
+        panel.add(roomsPane, constraints)
+        panel.add(refreshButton, constraints)
+        panel.add(createRoomButton, constraints)
+        panel.add(joinRoomButton, constraints)
+
+        return panel
+    }
+
+    private fun createRoomMenu(): JPanel {
+        val panel = JPanel(GridBagLayout()).apply { background = Color(0xFFD1DC) }
 
         val constraints = GridBagConstraints().apply {
             gridx = 0
@@ -610,12 +644,20 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
             onlineModeButton -> {
                 showMenu("Online", this)
                 gameManager?.onGameEvent(GameEvent.START_CLIENT)
+                gameManager?.onGameEvent(GameEvent.GET_ROOMS)
+            }
+            joinRoomButton -> {
+                val room = roomsJList.selectedValue
+                gameManager?.onJoinRoom(room)
+                showMenu("Room", this)
             }
 
             startGameButton -> gameManager?.onGameStart(gameOptionList)
             optionsButton -> showMenu("Options", gameButtonsPanel)
-            startOnlineGameButton -> gameManager?.onGameEvent(GameEvent.START_ONLINE_GAME)
 
+            refreshButton -> gameManager?.onGameEvent(GameEvent.GET_ROOMS)
+            createRoomButton -> createRoom()
+            startOnlineGameButton -> gameManager?.onGameEvent(GameEvent.START_ONLINE_GAME)
 
             resetButton -> {
                 scoreKeeper.resetScore()
@@ -824,6 +866,40 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         repaint()
     }
 
+    private fun createRoom() {
+        var input: String
+        val frame = JFrame("Room Name")
+        frame.defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
+        frame.setSize(300, 125)
+        frame.isResizable = false
+
+        val panel = JPanel().apply { background = Color(0xFFD1DC); layout = BorderLayout() }
+        val bottomPanel = JPanel().apply { background = Color(0xFFD1DC) }
+        val textBox = JTextField()
+
+        panel.add(bottomPanel, BorderLayout.SOUTH)
+        panel.add(JLabel("Enter room name.").apply {
+            preferredSize = Dimension(275, 85)
+            font = Font("Segoe UI", 0, 28)
+            horizontalAlignment = JLabel.CENTER
+            verticalAlignment = JLabel.NORTH
+        }, BorderLayout.NORTH)
+        bottomPanel.add(textBox)
+        bottomPanel.add(JButton("Confirm").apply {
+            addActionListener {
+                input = textBox.text
+                if (input.isNotBlank()) {
+                    gameManager?.onCreateRoom(GameRoom(input, -1, mutableListOf()))
+                    frame.dispose()
+                    gameManager?.onGameEvent(GameEvent.GET_ROOMS)
+                }
+            }
+        })
+
+        frame.add(panel)
+        frame.setLocationRelativeTo(null)
+        frame.isVisible = true
+    }
 
     private fun scaleComponents(container: Container, sx: Double, sy: Double) {
         for (component in container.components) {
@@ -841,6 +917,10 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         }
     }
 
+    fun setRooms(roomList: MutableList<GameRoom>) {
+        roomsList.clear()
+        for (room in roomList) roomsList.addElement(room)
+    }
 
     //no implementation needed
     override fun keyTyped(e: KeyEvent?) {}

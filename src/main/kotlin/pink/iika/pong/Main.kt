@@ -130,6 +130,7 @@ fun main() {
             onlineGamePanel.setScale(scale, scale)
             gameFrame.setSize((1920 * scale).toInt(), (1080 * scale).toInt())
             resolutionFrame.dispose()
+            gameFrame.setLocationRelativeTo(null)
             gameFrame.isVisible = true
         }})
         resolutionPanel.add(bottomPanel, BorderLayout.SOUTH)

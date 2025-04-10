@@ -1,9 +1,9 @@
 package pink.iika.pong.util.gameenum
 
 enum class ClientPacketType {
-    JOIN_LOBBY,
+    JOIN_ROOM,
     JOIN_ACCEPTED_ACK,
-    EXIT_LOBBY,
+    EXIT_ROOM,
     PADDLE_LEFT_START,
     PADDLE_LEFT_END,
     PADDLE_RIGHT_START,

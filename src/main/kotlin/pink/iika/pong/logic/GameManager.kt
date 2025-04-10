@@ -12,6 +12,7 @@ import pink.iika.pong.logic.gameobject.Paddle
 import pink.iika.pong.logic.gameobject.PowerUp
 import pink.iika.pong.util.gameenum.PowerUpType
 import pink.iika.pong.logic.gameobject.Ball
+import pink.iika.pong.logic.server.GameRoom
 import pink.iika.pong.util.gameenum.GameEvent
 import pink.iika.pong.util.listener.GameListener
 import java.awt.Color
@@ -45,9 +46,10 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
             GameEvent.CONTINUE_GAME_TWO -> startGame(2)
             GameEvent.PAUSE_GAME -> pauseGame()
             GameEvent.RESUME_GAME -> resumeGame()
-            GameEvent.ENABLE_START -> enableOnlineStart()
+            GameEvent.ENABLE_START -> {enableOnlineStart(); println("enablingstart yayayaya")}
             GameEvent.START_ONLINE_GAME -> startOnlineGame()
             GameEvent.START_CLIENT -> startClient()
+            GameEvent.GET_ROOMS -> client.getRooms()
         }
     }
 
@@ -89,6 +91,18 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
     override fun onTogglePowerUp(type: PowerUpType, exclude: Boolean) {
         if (exclude) gameLoop.getExcludeList().add(type)
         else gameLoop.getExcludeList().remove(type)
+    }
+
+    override fun onJoinRoom(room: GameRoom) {
+        client.joinRoom(room)
+    }
+
+    override fun onUpdateRooms(roomList: MutableList<GameRoom>) {
+        menuPanel.setRooms(roomList)
+    }
+
+    override fun onCreateRoom(room: GameRoom) {
+        client.createRoom(room)
     }
 
     private fun startGame(paddleNum: Int = 0, gameOptionList: DefaultListModel<GameOption> = DefaultListModel<GameOption>()) {
