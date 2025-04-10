@@ -30,3 +30,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.gradle/
