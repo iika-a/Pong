@@ -1,5 +1,8 @@
 package pink.iika.pong.logic
 
+import pink.iika.pong.logic.client.GameClient
+import pink.iika.pong.logic.client.OnlineGamePanel
+import pink.iika.pong.logic.client.ServerHandler
 import pink.iika.pong.util.gameenum.GameMap
 import pink.iika.pong.util.gameenum.GameMode
 import pink.iika.pong.logic.gameobject.GameObject
@@ -9,6 +12,7 @@ import pink.iika.pong.logic.gameobject.Paddle
 import pink.iika.pong.logic.gameobject.PowerUp
 import pink.iika.pong.util.gameenum.PowerUpType
 import pink.iika.pong.logic.gameobject.Ball
+import pink.iika.pong.logic.server.GameRoom
 import pink.iika.pong.util.gameenum.GameEvent
 import pink.iika.pong.util.listener.GameListener
 import java.awt.Color
@@ -16,13 +20,14 @@ import java.awt.event.KeyEvent
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.swing.DefaultListModel
 
-class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: CopyOnWriteArrayList<GameObject>):
+class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuPanel, private val onlineGamePanel: OnlineGamePanel, private val scoreKeeper: ScoreKeeper, private val gameObjectList: CopyOnWriteArrayList<GameObject>, handler: ServerHandler):
     GameListener {
     private var playerNum = 0
     private val powerUpList = CopyOnWriteArrayList<PowerUp>()
     private val colors = arrayOf(Color(0xE4A8CA), Color(0xCCAA87), Color(0xBB6588), Color(0x8889CC))
     private val keybinds = arrayOf(KeyEvent.VK_COMMA, KeyEvent.VK_SLASH, KeyEvent.VK_F, KeyEvent.VK_H)
     private val gameLoop = GameLoop(gamePanel, powerUpList)
+    private val client = GameClient(handler, onlineGamePanel, this)
 
     init {
         gamePanel.setPowerUpList(powerUpList)
@@ -39,6 +44,12 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
             GameEvent.ADD_SCORE_TWO_HALF -> scoreKeeper.score2 += 0.5
             GameEvent.CONTINUE_GAME_ONE -> startGame(1)
             GameEvent.CONTINUE_GAME_TWO -> startGame(2)
+            GameEvent.PAUSE_GAME -> pauseGame()
+            GameEvent.RESUME_GAME -> resumeGame()
+            GameEvent.ENABLE_START -> {enableOnlineStart(); println("enablingstart yayayaya")}
+            GameEvent.START_ONLINE_GAME -> startOnlineGame()
+            GameEvent.START_CLIENT -> startClient()
+            GameEvent.GET_ROOMS -> client.getRooms()
         }
     }
 
@@ -48,6 +59,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     override fun onGameEnd() {
         gameLoop.stop()
+        gamePanel.setPaused(true)
     }
 
     override fun onSetKeybind(key: Int, index: Int) {
@@ -58,6 +70,11 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
                 0, 2 -> paddle.leftKey = key
                 1, 3 -> paddle.rightKey = key
             }
+
+            when (index) {
+                0 -> onlineGamePanel.setLeftControl(key)
+                1 -> onlineGamePanel.setRightControl(key)
+            }
         }
     }
 
@@ -66,6 +83,9 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
             0, 1, 2, 3 -> colors[index] = color
             4 -> gamePanel.background = color
         }
+
+        gamePanel.setColors(colors)
+        onlineGamePanel.setColors(colors)
     }
 
     override fun onTogglePowerUp(type: PowerUpType, exclude: Boolean) {
@@ -73,9 +93,21 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         else gameLoop.getExcludeList().remove(type)
     }
 
+    override fun onJoinRoom(room: GameRoom) {
+        client.joinRoom(room)
+    }
+
+    override fun onUpdateRooms(roomList: MutableList<GameRoom>) {
+        menuPanel.setRooms(roomList)
+    }
+
+    override fun onCreateRoom(room: GameRoom) {
+        client.createRoom(room)
+    }
+
     private fun startGame(paddleNum: Int = 0, gameOptionList: DefaultListModel<GameOption> = DefaultListModel<GameOption>()) {
         menuPanel.isVisible = false
-        gamePanel.setColors(colors)
+        gamePanel.setPaused(false)
 
         for (i in 0..<gameOptionList.size) {
             val gameOption = gameOptionList[i]
@@ -134,11 +166,32 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         gamePanel.requestFocusInWindow()
     }
 
+    private fun startOnlineGame() {
+        client.startGame()
+        onlineGamePanel.isVisible = true
+        menuPanel.setOnlineGameButton(false)
+        onlineGamePanel.requestFocusInWindow()
+    }
+
+    private fun startClient() {
+        client.startClient()
+    }
+
+    private fun pauseGame() {
+        gameLoop.pause()
+    }
+
+    private fun resumeGame() {
+        gameLoop.resume()
+        gamePanel.setPaused(false)
+    }
+
     private fun doMenu() {
         for (i in gameObjectList.lastIndex downTo 2) gameObjectList.removeAt(i)
         gamePanel.setSplitGame(false)
         gamePanel.setDoubleBall(false)
         gamePanel.isVisible = false
+        gameLoop.reset()
         menuPanel.doMenu()
     }
 
@@ -174,4 +227,6 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
         gamePanel.setPlayers(playerNum)
         gameLoop.setPlayerNum(playerNum)
     }
+
+    private fun enableOnlineStart() = menuPanel.setOnlineGameButton(true)
 }
