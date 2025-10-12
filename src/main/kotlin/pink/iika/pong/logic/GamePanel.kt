@@ -14,6 +14,7 @@ import pink.iika.pong.util.listener.GameListener
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
+import java.awt.GradientPaint
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
@@ -40,7 +41,7 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     private var player1Gain = 0
     private var player2Gain = 0
     private val gameFont = Font("Segoe UI", 0, 20)
-    private val countLabel = JLabel("3...").apply { font = gameFont.deriveFont(26f) }
+    private val countLabel = JLabel("3").apply { font = gameFont.deriveFont(26f) }
     private val lossLabel = JLabel("You Lose!").apply { font = gameFont.deriveFont(26f) }
     private val multiLossLabel = JLabel("Player 1: +$player1Gain      Player 2: +$player2Gain").apply { font = gameFont }
     private val winLabel = JLabel("You Win!").apply { font = gameFont.deriveFont(26f) }
@@ -568,17 +569,21 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
     private fun drawArrow(g2d: Graphics2D, startX: Double, startY: Double, angle: Double) {
         val headLength = 20.0
         val offset = 20.0
+        val tipExtra = 5.0
 
         val offsetX = startX + offset * cos(angle)
         val offsetY = startY + offset * sin(angle)
 
-        val endX = offsetX + headLength * cos(angle)
-        val endY = offsetY + headLength * sin(angle)
+        val equilateralEndX = offsetX + headLength * cos(angle)
+        val equilateralEndY = offsetY + headLength * sin(angle)
 
-        val leftHeadX = endX - headLength * cos(angle - PI / 6)
-        val leftHeadY = endY - headLength * sin(angle - PI / 6)
-        val rightHeadX = endX - headLength * cos(angle + PI / 6)
-        val rightHeadY = endY - headLength * sin(angle + PI / 6)
+        val endX = equilateralEndX + tipExtra * cos(angle)
+        val endY = equilateralEndY + tipExtra * sin(angle)
+
+        val leftHeadX = equilateralEndX - headLength * cos(angle - PI / 6)
+        val leftHeadY = equilateralEndY - headLength * sin(angle - PI / 6)
+        val rightHeadX = equilateralEndX - headLength * cos(angle + PI / 6)
+        val rightHeadY = equilateralEndY - headLength * sin(angle + PI / 6)
 
         val arrowhead = Path2D.Double().apply {
             moveTo(endX, endY)
@@ -587,13 +592,19 @@ class GamePanel(private val gameObjectList: CopyOnWriteArrayList<GameObject>, pr
             closePath()
         }
 
-        g2d.color = Color(0xFFD1DC)
+        val gradient = GradientPaint(
+            offsetX.toFloat(), offsetY.toFloat(), Color(0xFFD1DC),
+            endX.toFloat(), endY.toFloat(), Color(0xFF69DC)
+        )
+
+        g2d.paint = gradient
         g2d.fill(arrowhead)
 
         g2d.stroke = BasicStroke(2f)
         g2d.color = Color.BLACK
         g2d.draw(arrowhead)
     }
+
 
     private fun pause() {
         if (isRunning) {

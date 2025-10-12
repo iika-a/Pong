@@ -56,7 +56,7 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: CopyOn
     fun reset() {
         count = 0
         loopThread = Thread(this)
-        gamePanel.getCountLabel().text = "3..."
+        gamePanel.getCountLabel().text = "3"
     }
 
     fun createPowerUp() {
@@ -97,8 +97,8 @@ class GameLoop(private val gamePanel: GamePanel, private val powerUpList: CopyOn
             val startTime = System.nanoTime()
 
             if (++count >= targetFPS * 3) gamePanel.advanceGame(1.0 / targetFPS)
-            if (count == targetFPS) gamePanel.getCountLabel().text = "2.."
-            if (count == targetFPS * 2) gamePanel.getCountLabel().text = "1."
+            if (count == targetFPS) gamePanel.getCountLabel().text = "2"
+            if (count == targetFPS * 2) gamePanel.getCountLabel().text = "1"
             if (count == targetFPS * 3) {
                 gamePanel.setRunning(true)
                 gamePanel.setPaused(false)
