@@ -15,5 +15,6 @@ enum class GameEvent {
     START_ONLINE_GAME,
     ENABLE_START,
     START_CLIENT,
+    STOP_CLIENT,
     GET_ROOMS
 }

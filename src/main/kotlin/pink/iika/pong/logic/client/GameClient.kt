@@ -19,6 +19,10 @@ class GameClient(private val handler: ServerHandler, private val contentPanel: O
         }
     }
 
+    fun stopClient() {
+        handler.stopReceiver()
+    }
+
     private fun handlePacket(packet: DatagramPacket) {
         val buffer = ByteBuffer.wrap(packet.data, 0, packet.length)
         val ordinal = buffer.get().toInt()

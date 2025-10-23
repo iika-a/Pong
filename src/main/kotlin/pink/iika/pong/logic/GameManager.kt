@@ -49,6 +49,7 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
             GameEvent.ENABLE_START -> {enableOnlineStart(); println("enablingstart yayayaya")}
             GameEvent.START_ONLINE_GAME -> startOnlineGame()
             GameEvent.START_CLIENT -> startClient()
+            GameEvent.STOP_CLIENT -> stopClient()
             GameEvent.GET_ROOMS -> client.getRooms()
         }
     }
@@ -175,6 +176,10 @@ class GameManager(private val gamePanel: GamePanel, private val menuPanel: MenuP
 
     private fun startClient() {
         client.startClient()
+    }
+
+    private fun stopClient() {
+        client.stopClient()
     }
 
     private fun pauseGame() {

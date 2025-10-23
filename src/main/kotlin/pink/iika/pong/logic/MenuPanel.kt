@@ -126,6 +126,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
     private val refreshButton = JButton("Refresh Rooms").apply { setButtonSettings(this) }
     private val createRoomButton = JButton("Create Room").apply { setButtonSettings(this) }
     private val joinRoomButton = JButton("Join Room").apply { setButtonSettings(this) }
+    private val onlineBackButton = JButton("Back").apply { setButtonSettings(this) }
 
     private val startOnlineGameButton = JButton("Start Game!").apply { setButtonSettings(this) }
 
@@ -309,6 +310,7 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
         panel.add(refreshButton, constraints)
         panel.add(createRoomButton, constraints)
         panel.add(joinRoomButton, constraints)
+        panel.add(onlineBackButton, constraints)
 
         return panel
     }
@@ -706,6 +708,11 @@ class MenuPanel(private val scoreKeeper: ScoreKeeper, private val buttonMouseLis
                     }
                     "Options" -> showMenu("Confirm", gameButtonsPanel)
                 }
+            }
+            onlineBackButton -> {
+                showMenu("Players", gameButtonsPanel)
+                showMenu("Game Setup", this)
+                gameManager?.onGameEvent(GameEvent.STOP_CLIENT)
             }
 
             settingsBackButton -> {
