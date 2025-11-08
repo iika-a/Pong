@@ -9,7 +9,7 @@ import kotlin.concurrent.thread
 
 class ServerHandler(private val port: Int) {
     private var socket = DatagramSocket()
-    private val address: InetAddress = InetAddress.getByName("172.16.96.221")
+    private val address: InetAddress = InetAddress.getByName("150.136.229.133")
     @Volatile
     private var isReceiving = false
     private var receiverThread: Thread? = null
